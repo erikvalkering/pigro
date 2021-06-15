@@ -6,7 +6,7 @@ using namespace std;
 namespace pigro {
 
 constexpr auto lazy = [](auto f) {
-    return [] { return 0; };
+    return [=] { return f(); };
 };
 
 } // namespace pigro
