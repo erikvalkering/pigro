@@ -19,14 +19,14 @@ auto test_cached() {
     auto counter = 0;
     auto foo = lazy([&] {
         ++counter;
-        return 0;
+        return 42;
     });
 
     assert(counter == 0);
-    assert(foo() == 0);
+    assert(foo() == 42);
     assert(counter == 1);
 
-    assert(foo() == 0);
+    assert(foo() == 42);
     assert(counter == 1);
 }
 
