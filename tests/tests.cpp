@@ -1,12 +1,22 @@
 #include <cassert>
 #include <iostream>
+#include <optional>
 
 using namespace std;
 
 namespace pigro {
 
 constexpr auto lazy = [](auto f) {
-    return [=] { return f(); };
+    using result_t = decltype(f());
+
+    auto cache = std::optional<result_t>{};
+    return [=]() mutable {
+        if (!cache) {
+            cache = f();
+        }
+
+        return *cache;
+    };
 };
 
 } // namespace pigro
