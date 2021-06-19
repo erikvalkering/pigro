@@ -1,0 +1,30 @@
+#include "../src/pigro/overload.h"
+
+#include <cassert>
+#include <iostream>
+
+using namespace std;
+
+namespace pigro::tests {
+
+auto test_overload = [] {
+    cout << "test_overload" << endl;
+
+    auto r1 = overload{ [] {}, [] {} };
+    auto r2 = overload{ [] {}, [x = 1] { return x; } };
+    auto r3 = overload{ [x = 'a'] { return x; }, [] {} };
+    auto r4 = overload{ [] {}, [x = 1] { return x; }, [] {}, [x = 1] { return x; } };
+
+    static_assert(is_empty_v<decltype(r1)>);
+    static_assert(sizeof(r1) == sizeof(char));
+    static_assert(!is_empty_v<decltype(r2)>);
+    static_assert(sizeof(r2) == sizeof(int));
+    static_assert(!is_empty_v<decltype(r3)>);
+    static_assert(sizeof(r3) == sizeof(char));
+    static_assert(!is_empty_v<decltype(r4)>);
+    static_assert(sizeof(r4) == 2 * sizeof(int));
+
+    return 0;
+}();
+
+} // namespace pigro::tests
