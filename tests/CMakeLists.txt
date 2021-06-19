@@ -1,2 +1,6 @@
-add_executable(tests tests.cpp lazy.test.cpp recursive_overload.test.cpp)
+add_executable(tests
+	tests.cpp
+	recursive_overload.test.cpp
+	lazy.test.cpp
+)
 set_property(TARGET tests PROPERTY CXX_STANDARD 17)
