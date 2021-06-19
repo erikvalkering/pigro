@@ -32,7 +32,7 @@ struct __declspec(empty_bases) overload : overload_impl<partition_t<std::is_empt
 template<typename... Fs>
 struct overload : Fs... {
     using Fs::operator()...;
-}
+};
 #endif
 
 } // namespace pigro
