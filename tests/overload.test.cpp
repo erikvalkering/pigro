@@ -44,6 +44,12 @@ auto test_ebo_msvc_workaround = [] {
         [] {},
         [x = 1] { return x; },
     };
+    auto r5 = overload{
+        [x = 1] { return x; },
+        [] {},
+        [x = 1] { return x; },
+        [] {},
+    };
 
     static_assert(is_empty_v<decltype(r1)>);
     static_assert(sizeof(r1) == sizeof(char));
@@ -53,6 +59,8 @@ auto test_ebo_msvc_workaround = [] {
     static_assert(sizeof(r3) == sizeof(char));
     static_assert(!is_empty_v<decltype(r4)>);
     static_assert(sizeof(r4) == 2 * sizeof(int));
+    static_assert(!is_empty_v<decltype(r5)>);
+    static_assert(sizeof(r5) == 2 * sizeof(int));
 
     return 0;
 }();
