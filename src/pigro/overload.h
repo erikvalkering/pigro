@@ -35,7 +35,4 @@ struct overload : Fs... {
 }
 #endif
 
-template<typename... Fs>
-overload(Fs...) -> overload<Fs...>;
-
 } // namespace pigro

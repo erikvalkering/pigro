@@ -6,4 +6,4 @@ add_executable(tests
 	recursive_overload.test.cpp
 	lazy.test.cpp
 )
-set_property(TARGET tests PROPERTY CXX_STANDARD 17)
+set_property(TARGET tests PROPERTY CXX_STANDARD 20)
