@@ -1,4 +1,5 @@
-#include "../src/pigro/recursive_overload.h"
+#include "../src/pigro/overload.h"
+#include "../src/pigro/recursive.h"
 
 #include <cassert>
 #include <iostream>
@@ -10,12 +11,12 @@ namespace pigro::tests {
 auto test_recursive_overload = [] {
     cout << "test_recursive_overload" << endl;
 
-    const auto f = recursive_overload{
-        [](auto self, int) { return "int"s; },
-        [](auto self, double) { return "double"s; },
-        [](auto self, auto) { return "auto"s; },
-        [](auto self, string) { return self(0); },
-    };
+    const auto f = recursive{ overload{
+      [](auto self, int) { return "int"s; },
+      [](auto self, double) { return "double"s; },
+      [](auto self, auto) { return "auto"s; },
+      [](auto self, string) { return self(0); },
+    } };
 
     assert(f(0) == "int");
     assert(f(0.0) == "double");
@@ -23,15 +24,15 @@ auto test_recursive_overload = [] {
     assert(f("a"s) == "int");
 
     const auto g = [] { return 0; };
-    const auto h = recursive_overload{
-        [=](auto self) { return g(); },
-    };
+    const auto h = recursive{ overload{
+      [=](auto self) { return g(); },
+    } };
 
     assert(h() == 0);
 
-    auto k = recursive_overload{
-        [](auto self) mutable { return 0; },
-    };
+    auto k = recursive{ overload{
+      [](auto self) mutable { return 0; },
+    } };
 
     assert(k() == 0);
 
