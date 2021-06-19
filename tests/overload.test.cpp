@@ -10,6 +10,22 @@ namespace pigro::tests {
 auto test_overload = [] {
     cout << "test_overload" << endl;
 
+    const auto f = overload{
+        [](int) { return "int"s; },
+        [](double) { return "double"s; },
+        [](auto) { return "auto"s; },
+    };
+
+    assert(f(0) == "int");
+    assert(f(0.0) == "double");
+    assert(f(true) == "auto");
+
+    return 0;
+}();
+
+auto test_ebo_msvc_workaround = [] {
+    cout << "test_ebo_msvc_workaround" << endl;
+
     auto r1 = overload{ [] {}, [] {} };
     auto r2 = overload{ [] {}, [x = 1] { return x; } };
     auto r3 = overload{ [x = 'a'] { return x; }, [] {} };
