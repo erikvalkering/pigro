@@ -26,10 +26,24 @@ auto test_overload = [] {
 auto test_ebo_msvc_workaround = [] {
     cout << "test_ebo_msvc_workaround" << endl;
 
-    auto r1 = overload{ [] {}, [] {} };
-    auto r2 = overload{ [] {}, [x = 1] { return x; } };
-    auto r3 = overload{ [x = 'a'] { return x; }, [] {} };
-    auto r4 = overload{ [] {}, [x = 1] { return x; }, [] {}, [x = 1] { return x; } };
+    auto r1 = overload{
+        [] {},
+        [] {},
+    };
+    auto r2 = overload{
+        [] {},
+        [x = 1] { return x; },
+    };
+    auto r3 = overload{
+        [x = 'a'] { return x; },
+        [] {},
+    };
+    auto r4 = overload{
+        [] {},
+        [x = 1] { return x; },
+        [] {},
+        [x = 1] { return x; },
+    };
 
     static_assert(is_empty_v<decltype(r1)>);
     static_assert(sizeof(r1) == sizeof(char));
