@@ -4,7 +4,7 @@
 
 namespace pigro {
 
-constexpr auto lazy = [](auto f, auto dep) {
+auto lazy(auto f, auto dep) {
     using result_t = decltype(f(dep()));
     using dep_result_t = decltype(dep());
 
@@ -19,6 +19,6 @@ constexpr auto lazy = [](auto f, auto dep) {
 
         return *cache;
     };
-};
+}
 
 } // namespace pigro
