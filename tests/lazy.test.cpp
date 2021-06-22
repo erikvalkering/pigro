@@ -113,4 +113,55 @@ auto test_lazy_dependencies = [] {
     return 0;
 }();
 
+template<typename T>
+struct Spy {
+    T object;
+
+    int *comparisons;
+    auto operator==(const Spy &rhs) const {
+        ++*comparisons;
+        return object == rhs.object;
+    }
+    auto operator!=(const Spy &rhs) const {
+        return !this->operator==(rhs);
+    }
+};
+
+auto test_comparisons = [] {
+    cout << "test_comparisons" << endl;
+
+    auto f_comparisons = 0;
+    auto f_result = Spy{ 0, &f_comparisons };
+    auto f = [&]() {
+        return f_result;
+    };
+
+    auto g_comparisons = 0;
+    auto g_result = Spy{ 0, &g_comparisons };
+    auto g = lazy([&](auto f) {
+        return g_result;
+    },
+      f);
+
+    auto h = lazy([&](auto g) {
+        return 0;
+    },
+      g);
+
+    h();
+    assert(*f_result.comparisons == 0);
+    assert(*g_result.comparisons == 0);
+
+    h();
+    assert(*f_result.comparisons == 1);
+    assert(*g_result.comparisons == 0);
+
+    ++f_result.object;
+    h();
+    assert(*f_result.comparisons == 2);
+    assert(*g_result.comparisons == 1);
+
+    return 0;
+}();
+
 } // namespace pigro::tests
