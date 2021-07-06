@@ -1,42 +1,41 @@
 #include "../src/pigro/overload.h"
 #include "../src/pigro/recursive.h"
 
-#include <cassert>
-#include <iostream>
+#define BOOST_UT_DISABLE_MODULE
+#include <boost/ut.hpp>
 
+using namespace boost::ut;
 using namespace std;
 
 namespace pigro::tests {
 
-auto test_recursive_overload = [] {
-    cout << "test_recursive_overload" << endl;
+suite recursive_overload_tests = [] {
+    "test_recursive_overload"_test = [] {
+        const auto f = recursive{ overload{
+          [](auto self, int) { return "int"s; },
+          [](auto self, double) { return "double"s; },
+          [](auto self, auto) { return "auto"s; },
+          [](auto self, string) { return self(0); },
+        } };
 
-    const auto f = recursive{ overload{
-      [](auto self, int) { return "int"s; },
-      [](auto self, double) { return "double"s; },
-      [](auto self, auto) { return "auto"s; },
-      [](auto self, string) { return self(0); },
-    } };
+        expect(f(0) == "int"s);
+        expect(f(0.0) == "double"s);
+        expect(f(true) == "auto"s);
+        expect(f("a"s) == "int"s);
 
-    assert(f(0) == "int");
-    assert(f(0.0) == "double");
-    assert(f(true) == "auto");
-    assert(f("a"s) == "int");
+        const auto g = [] { return 0; };
+        const auto h = recursive{ overload{
+          [=](auto self) { return g(); },
+        } };
 
-    const auto g = [] { return 0; };
-    const auto h = recursive{ overload{
-      [=](auto self) { return g(); },
-    } };
+        expect(h() == 0_i);
 
-    assert(h() == 0);
+        auto k = recursive{ overload{
+          [](auto self) mutable { return 0; },
+        } };
 
-    auto k = recursive{ overload{
-      [](auto self) mutable { return 0; },
-    } };
-
-    assert(k() == 0);
-
-    return 0;
-}();
+        expect(k() == 0_i);
+    };
+};
 
 } // namespace pigro::tests
