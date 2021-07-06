@@ -8,6 +8,20 @@ using namespace std;
 
 namespace pigro::tests {
 
+template<typename T>
+struct Spy {
+    T object;
+
+    int *comparisons;
+    auto operator==(const Spy &rhs) const {
+        ++*comparisons;
+        return object == rhs.object;
+    }
+    auto operator!=(const Spy &rhs) const {
+        return !this->operator==(rhs);
+    }
+};
+
 suite lazy_tests = [] {
     "test_cached"_test = [] {
         auto counter = 0;
@@ -103,20 +117,6 @@ suite lazy_tests = [] {
         expect(baz_counter == 4_i);
     };
 
-
-    template<typename T>
-    struct Spy {
-        T object;
-
-        int *comparisons;
-        auto operator==(const Spy &rhs) const {
-            ++*comparisons;
-            return object == rhs.object;
-        }
-        auto operator!=(const Spy &rhs) const {
-            return !this->operator==(rhs);
-        }
-    };
 
     "test_comparisons"_test = [] {
         auto f_comparisons = 0;
