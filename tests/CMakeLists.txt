@@ -7,3 +7,4 @@ add_executable(tests
 	lazy.test.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
+target_include_directories(tests PRIVATE ../extlib)
