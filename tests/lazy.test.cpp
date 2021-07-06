@@ -1,167 +1,155 @@
 #include "../src/pigro/lazy.h"
 
-#include <cassert>
-#include <iostream>
+#define BOOST_UT_DISABLE_MODULE
+#include <boost/ut.hpp>
 
+using namespace boost::ut;
 using namespace std;
 
 namespace pigro::tests {
 
-auto test_cached = [] {
-    cout << "test_cached" << endl;
+suite lazy_tests = [] {
+    "test_cached"_test = [] {
+        auto counter = 0;
+        auto foo = lazy([&] {
+            ++counter;
+            return 42;
+        });
 
-    auto counter = 0;
-    auto foo = lazy([&] {
-        ++counter;
-        return 42;
-    });
+        expect(counter == 0_i);
+        expect(foo() == 42_i);
+        expect(counter == 1_i);
 
-    assert(counter == 0);
-    assert(foo() == 42);
-    assert(counter == 1);
-
-    assert(foo() == 42);
-    assert(counter == 1);
-
-    return 0;
-}();
-
-auto test_dependencies = [] {
-    cout << "test_dependencies" << endl;
-
-    auto bar_counter = 0;
-    auto bar_result = 40;
-    const auto bar = [&] {
-        ++bar_counter;
-        return bar_result;
+        expect(foo() == 42_i);
+        expect(counter == 1_i);
     };
 
-    auto foo_counter = 0;
-    auto foo = lazy([&](auto bar) {
-        ++foo_counter;
-        return bar + 2;
-    },
-      bar);
+    "test_dependencies"_test = [] {
+        auto bar_counter = 0;
+        auto bar_result = 40;
+        const auto bar = [&] {
+            ++bar_counter;
+            return bar_result;
+        };
 
-    assert(foo_counter == 0);
-    assert(bar_counter == 0);
+        auto foo_counter = 0;
+        auto foo = lazy([&](auto bar) {
+            ++foo_counter;
+            return bar + 2;
+        },
+          bar);
 
-    assert(foo() == 42);
-    assert(foo_counter == 1);
-    assert(bar_counter == 1);
+        expect(foo_counter == 0_i);
+        expect(bar_counter == 0_i);
 
-    assert(foo() == 42);
-    assert(foo_counter == 1);
-    assert(bar_counter == 2);
+        expect(foo() == 42_i);
+        expect(foo_counter == 1_i);
+        expect(bar_counter == 1_i);
 
-    ++bar_result;
-    assert(foo() == 43);
-    assert(foo_counter == 2);
-    assert(bar_counter == 3);
+        expect(foo() == 42_i);
+        expect(foo_counter == 1_i);
+        expect(bar_counter == 2_i);
 
-    return 0;
-}();
-
-auto test_lazy_dependencies = [] {
-    cout << "test_lazy_dependencies" << endl;
-
-    auto baz_counter = 0;
-    auto baz_result = 0;
-    const auto baz = [&] {
-        ++baz_counter;
-        return baz_result;
+        ++bar_result;
+        expect(foo() == 43_i);
+        expect(foo_counter == 2_i);
+        expect(bar_counter == 3_i);
     };
 
-    auto bar_counter = 0;
-    auto bar = lazy([&](auto baz) {
-        ++bar_counter;
-        return baz + 2;
-    },
-      baz);
+    "test_lazy_dependencies"_test = [] {
+        auto baz_counter = 0;
+        auto baz_result = 0;
+        const auto baz = [&] {
+            ++baz_counter;
+            return baz_result;
+        };
 
-    auto foo_counter = 0;
-    auto foo = lazy([&](auto bar) {
-        ++foo_counter;
-        return bar + 40;
-    },
-      bar);
+        auto bar_counter = 0;
+        auto bar = lazy([&](auto baz) {
+            ++bar_counter;
+            return baz + 2;
+        },
+          baz);
 
-    assert(foo_counter == 0);
-    assert(bar_counter == 0);
-    assert(baz_counter == 0);
-    assert(foo() == 42);
-    assert(foo_counter == 1);
-    assert(bar_counter == 1);
-    assert(baz_counter == 1);
+        auto foo_counter = 0;
+        auto foo = lazy([&](auto bar) {
+            ++foo_counter;
+            return bar + 40;
+        },
+          bar);
 
-    assert(foo() == 42);
-    assert(foo_counter == 1);
-    assert(bar_counter == 1);
-    assert(baz_counter == 2);
+        expect(foo_counter == 0_i);
+        expect(bar_counter == 0_i);
+        expect(baz_counter == 0_i);
+        expect(foo() == 42_i);
+        expect(foo_counter == 1_i);
+        expect(bar_counter == 1_i);
+        expect(baz_counter == 1_i);
 
-    ++baz_result;
-    assert(foo() == 43);
-    assert(foo_counter == 2);
-    assert(bar_counter == 2);
-    assert(baz_counter == 3);
+        expect(foo() == 42_i);
+        expect(foo_counter == 1_i);
+        expect(bar_counter == 1_i);
+        expect(baz_counter == 2_i);
 
-    assert(foo() == 43);
-    assert(foo_counter == 2);
-    assert(bar_counter == 2);
-    assert(baz_counter == 4);
+        ++baz_result;
+        expect(foo() == 43_i);
+        expect(foo_counter == 2_i);
+        expect(bar_counter == 2_i);
+        expect(baz_counter == 3_i);
 
-    return 0;
-}();
+        expect(foo() == 43_i);
+        expect(foo_counter == 2_i);
+        expect(bar_counter == 2_i);
+        expect(baz_counter == 4_i);
+    };
 
-template<typename T>
-struct Spy {
-    T object;
 
-    int *comparisons;
-    auto operator==(const Spy &rhs) const {
-        ++*comparisons;
-        return object == rhs.object;
-    }
-    auto operator!=(const Spy &rhs) const {
-        return !this->operator==(rhs);
-    }
+    template<typename T>
+    struct Spy {
+        T object;
+
+        int *comparisons;
+        auto operator==(const Spy &rhs) const {
+            ++*comparisons;
+            return object == rhs.object;
+        }
+        auto operator!=(const Spy &rhs) const {
+            return !this->operator==(rhs);
+        }
+    };
+
+    "test_comparisons"_test = [] {
+        auto f_comparisons = 0;
+        auto f_result = Spy{ 0, &f_comparisons };
+        auto f = [&]() {
+            return f_result;
+        };
+
+        auto g_comparisons = 0;
+        auto g_result = Spy{ 0, &g_comparisons };
+        auto g = lazy([&](auto f) {
+            return g_result;
+        },
+          f);
+
+        auto h = lazy([&](auto g) {
+            return 0;
+        },
+          g);
+
+        h();
+        expect(*f_result.comparisons == 0_i);
+        expect(*g_result.comparisons == 0_i);
+
+        h();
+        expect(*f_result.comparisons == 1_i);
+        expect(*g_result.comparisons == 0_i);
+
+        ++f_result.object;
+        h();
+        expect(*f_result.comparisons == 2_i);
+        expect(*g_result.comparisons == 1_i);
+    };
 };
-
-auto test_comparisons = [] {
-    cout << "test_comparisons" << endl;
-
-    auto f_comparisons = 0;
-    auto f_result = Spy{ 0, &f_comparisons };
-    auto f = [&]() {
-        return f_result;
-    };
-
-    auto g_comparisons = 0;
-    auto g_result = Spy{ 0, &g_comparisons };
-    auto g = lazy([&](auto f) {
-        return g_result;
-    },
-      f);
-
-    auto h = lazy([&](auto g) {
-        return 0;
-    },
-      g);
-
-    h();
-    assert(*f_result.comparisons == 0);
-    assert(*g_result.comparisons == 0);
-
-    h();
-    assert(*f_result.comparisons == 1);
-    assert(*g_result.comparisons == 0);
-
-    ++f_result.object;
-    h();
-    assert(*f_result.comparisons == 2);
-    assert(*g_result.comparisons == 1);
-
-    return 0;
-}();
 
 } // namespace pigro::tests
