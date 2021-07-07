@@ -130,6 +130,13 @@ suite lazy_tests = [] {
         expect(eval_count == 1_i);
     };
 
+    "void"_test = [] {
+        auto f = lazy([] {});
+        f();
+
+        expect(constant<type<decltype(f())> == type<void>>);
+    };
+
     "comparisons"_test = [] {
         auto f_comparisons = 0;
         auto f_result = Spy{ 0, &f_comparisons };
