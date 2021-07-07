@@ -42,7 +42,7 @@ constexpr auto is_changed = [](const lazy_result auto result) {
     return result.is_changed;
 };
 
-constexpr auto unwrap(lazy_function auto lazy_f) {
+constexpr auto unwrap_value(lazy_function auto lazy_f) {
     return recursive{
         overload{
           [=](auto &, std::nullptr_t) mutable {
@@ -61,7 +61,7 @@ constexpr auto lazy(auto f, lazy_function auto... deps) {
     using result_t = decltype(ff(deps(nullptr).value...));
 
     auto cache = std::optional<result_t>{};
-    return unwrap([=](std::nullptr_t) mutable {
+    return unwrap_value([=](std::nullptr_t) mutable {
         const auto args = std::tuple{ deps(nullptr)... };
 
         auto changed = !cache || any(args, is_changed);
