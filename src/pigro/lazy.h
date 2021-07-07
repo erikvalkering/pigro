@@ -91,12 +91,20 @@ constexpr auto ensure_lazy(auto dep) {
     return lazy_value(dep, std::false_type{});
 }
 
+constexpr auto ensure_lazy(std::nullptr_t dep) {
+    return lazy_value(dep, std::false_type{});
+}
+
 } // namespace pigro::detail
 
 namespace pigro {
 
 auto lazy(auto f, auto dep) {
     return detail::lazy(f, detail::ensure_lazy(dep));
+}
+
+auto lazy(auto f) {
+    return detail::lazy([=](std::nullptr_t) { return f(); }, detail::ensure_lazy(nullptr));
 }
 
 } // namespace pigro
