@@ -169,6 +169,20 @@ suite lazy_tests = [] {
         expect(*f_result.comparisons == 2_i);
         expect(*g_result.comparisons == 1_i);
     };
+
+    "variadic_dependencies"_test = [] {
+        const auto sum = [](auto... xs) {
+            return (xs + ... + 0);
+        };
+
+        auto f = lazy(sum);
+        auto g = lazy(sum, 1);
+        auto h = lazy(sum, 1, 2);
+
+        expect(f() == 0);
+        expect(g() == 1);
+        expect(h() == 3);
+    };
 };
 
 } // namespace pigro::tests
