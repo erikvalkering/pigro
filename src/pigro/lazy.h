@@ -3,6 +3,7 @@
 #include "overload.h"
 #include "recursive.h"
 #include "regular_void.h"
+#include "tuple_algorithms.h"
 
 #include <concepts>
 #include <cstddef>
@@ -33,6 +34,14 @@ concept lazy_function = requires(F f) {
         -> lazy_result;
 };
 
+constexpr auto value = [](const lazy_result auto result) {
+    return result.value;
+};
+
+constexpr auto is_changed = [](const lazy_result auto result) {
+    return result.is_changed;
+};
+
 constexpr auto unwrap(lazy_function auto lazy_f) {
     return recursive{
         overload{
@@ -46,19 +55,19 @@ constexpr auto unwrap(lazy_function auto lazy_f) {
     };
 }
 
-constexpr auto lazy(auto f, lazy_function auto dep) {
+constexpr auto lazy(auto f, lazy_function auto... deps) {
     auto ff = regularize_void(f);
 
-    using result_t = decltype(ff(dep(nullptr).value));
+    using result_t = decltype(ff(deps(nullptr).value...));
 
     auto cache = std::optional<result_t>{};
     return unwrap([=](std::nullptr_t) mutable {
-        const auto arg = dep(nullptr);
+        const auto args = std::tuple{ deps(nullptr)... };
 
-        auto changed = !cache || arg.is_changed;
+        auto changed = !cache || any(args, is_changed);
         if (changed) {
-            const auto value = arg.value;
-            const auto result = ff(value);
+            const auto values = transform(args, value);
+            const auto result = apply(ff, values);
 
             changed = cache != result;
             cache = std::move(result);
@@ -94,20 +103,12 @@ constexpr auto ensure_lazy(auto dep) {
     return lazy_value(dep, std::false_type{});
 }
 
-constexpr auto ensure_lazy(std::nullptr_t dep) {
-    return lazy_value(dep, std::false_type{});
-}
-
 } // namespace pigro::detail
 
 namespace pigro {
 
-auto lazy(auto f, auto dep) {
-    return detail::lazy(f, detail::ensure_lazy(dep));
-}
-
-auto lazy(auto f) {
-    return detail::lazy([=](std::nullptr_t) { return f(); }, detail::ensure_lazy(nullptr));
+auto lazy(auto f, auto... deps) {
+    return detail::lazy(f, detail::ensure_lazy(deps)...);
 }
 
 } // namespace pigro
