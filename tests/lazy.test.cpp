@@ -23,7 +23,7 @@ struct Spy {
 };
 
 suite lazy_tests = [] {
-    "test_cached"_test = [] {
+    "cached"_test = [] {
         auto counter = 0;
         auto foo = lazy([&] {
             ++counter;
@@ -38,7 +38,7 @@ suite lazy_tests = [] {
         expect(counter == 1_i);
     };
 
-    "test_dependencies"_test = [] {
+    "dependencies"_test = [] {
         auto bar_counter = 0;
         auto bar_result = 40;
         const auto bar = [&] {
@@ -70,7 +70,7 @@ suite lazy_tests = [] {
         expect(bar_counter == 3_i);
     };
 
-    "test_lazy_dependencies"_test = [] {
+    "lazy_dependencies"_test = [] {
         auto baz_counter = 0;
         auto baz_result = 0;
         const auto baz = [&] {
@@ -118,7 +118,7 @@ suite lazy_tests = [] {
     };
 
 
-    "test_comparisons"_test = [] {
+    "comparisons"_test = [] {
         auto f_comparisons = 0;
         auto f_result = Spy{ 0, &f_comparisons };
         auto f = [&]() {

@@ -9,7 +9,7 @@ using namespace std;
 namespace pigro::tests {
 
 suite overload_tests = [] {
-    "test_overload"_test = [] {
+    "overload"_test = [] {
         const auto f = overload{
             [](int) { return "int"s; },
             [](double) { return "double"s; },
@@ -21,7 +21,7 @@ suite overload_tests = [] {
         expect(f(true) == "auto"s);
     };
 
-    "test_ebo_msvc_workaround"_test = [] {
+    "ebo_msvc_workaround"_test = [] {
         auto r1 = overload{
             [] {},
             [] {},

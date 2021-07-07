@@ -10,7 +10,7 @@ using namespace std;
 namespace pigro::tests {
 
 suite recursive_overload_tests = [] {
-    "test_recursive_overload"_test = [] {
+    "recursive_overload"_test = [] {
         const auto f = recursive{ overload{
           [](auto self, int) { return "int"s; },
           [](auto self, double) { return "double"s; },

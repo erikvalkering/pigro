@@ -9,7 +9,7 @@ using namespace std;
 namespace pigro::tests {
 
 suite recursive_tests = [] {
-    "test_recursive"_test = [] {
+    "recursive"_test = [] {
         auto fibonacci = recursive{
             [](auto self, int n) -> int {
                 if (n < 2) return 1;

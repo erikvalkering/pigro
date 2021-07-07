@@ -11,7 +11,7 @@ using namespace std;
 namespace pigro::tests {
 
 suite partition_tests = [] {
-    "test_partition"_test = [] {
+    "partition"_test = [] {
         struct Empty {};
 
         constexpr auto list = typelist<
