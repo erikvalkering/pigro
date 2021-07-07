@@ -117,6 +117,18 @@ suite lazy_tests = [] {
         expect(baz_counter == 4_i);
     };
 
+    "values"_test = [] {
+        auto eval_count = 0;
+        auto f = lazy([&](auto x) {
+            ++eval_count;
+            return x + 40;
+        },
+          2);
+
+        expect(f() == 42_i);
+        expect(f() == 42_i);
+        expect(eval_count == 1_i);
+    };
 
     "comparisons"_test = [] {
         auto f_comparisons = 0;

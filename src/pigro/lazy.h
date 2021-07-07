@@ -76,8 +76,20 @@ constexpr auto lazy_always_reevaluate(std::invocable auto f) {
       lazy_value(0, std::true_type{}));
 };
 
+constexpr auto ensure_lazy(lazy_function auto dep) {
+    return dep;
+}
+
+constexpr auto ensure_lazy(std::invocable auto dep) {
+    return lazy_always_reevaluate(dep);
+}
+
+constexpr auto ensure_lazy(auto dep) {
+    return lazy_value(dep, std::false_type{});
+}
+
 auto lazy(auto f, auto dep) {
-    return lazy(f, lazy_always_reevaluate(dep));
+    return lazy(f, ensure_lazy(dep));
 }
 
 } // namespace pigro
