@@ -1,10 +1,10 @@
 add_executable(tests
-	tests.cpp
-	partition.test.cpp
+	lazy.test.cpp
 	overload.test.cpp
+	partition.test.cpp
 	recursive.test.cpp
 	recursive_overload.test.cpp
-	lazy.test.cpp
+	tests.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
 target_include_directories(tests PRIVATE ../extlib)
