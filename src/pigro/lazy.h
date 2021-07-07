@@ -2,6 +2,7 @@
 
 #include "overload.h"
 #include "recursive.h"
+#include "regular_void.h"
 
 #include <concepts>
 #include <cstddef>
@@ -39,14 +40,16 @@ constexpr auto unwrap(lazy_function auto lazy_f) {
               return lazy_f(nullptr);
           },
           [](auto &self) {
-              return self(nullptr).value;
+              return unregularize_void(self(nullptr).value);
           },
         }
     };
 }
 
 constexpr auto lazy(auto f, lazy_function auto dep) {
-    using result_t = decltype(f(dep(nullptr).value));
+    auto ff = regularize_void(f);
+
+    using result_t = decltype(ff(dep(nullptr).value));
 
     auto cache = std::optional<result_t>{};
     return unwrap([=](std::nullptr_t) mutable {
@@ -55,7 +58,7 @@ constexpr auto lazy(auto f, lazy_function auto dep) {
         auto changed = !cache || arg.is_changed;
         if (changed) {
             const auto value = arg.value;
-            const auto result = f(value);
+            const auto result = ff(value);
 
             changed = cache != result;
             cache = std::move(result);
