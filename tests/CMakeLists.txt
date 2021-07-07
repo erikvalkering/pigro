@@ -6,6 +6,7 @@ add_executable(tests
 	recursive_overload.test.cpp
 	regular_void.test.cpp
 	tests.cpp
+	tuple_algorithms.test.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
 target_include_directories(tests PRIVATE ../extlib)
