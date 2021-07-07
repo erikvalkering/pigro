@@ -20,9 +20,16 @@ template<typename T>
 LazyResult(const T &, bool) -> LazyResult<const T &>;
 LazyResult(int &&, bool)->LazyResult<int>;
 
+template<typename T>
+concept lazy_result = requires(T t) {
+    t.value;
+    t.is_changed;
+};
+
 template<typename F>
 concept lazy_function = requires(F f) {
-    f(nullptr);
+    { f(nullptr) }
+        -> lazy_result;
 };
 
 constexpr auto unwrap(lazy_function auto lazy_f) {
