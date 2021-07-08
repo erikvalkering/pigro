@@ -55,7 +55,7 @@ constexpr auto unwrap_value(concepts::lazy_function auto f) {
           [=](auto &, std::nullptr_t) mutable {
               return f(nullptr);
           },
-          unregularize_void([](auto &self) {
+          unregularized_void([](auto &self) {
               return self(nullptr).value;
           }),
         }
@@ -63,7 +63,7 @@ constexpr auto unwrap_value(concepts::lazy_function auto f) {
 }
 
 constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
-    auto ff = regularize_void(f);
+    auto ff = regularized_void(f);
 
     using result_t = decltype(ff(deps(nullptr).value...));
 

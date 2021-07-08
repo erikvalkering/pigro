@@ -9,7 +9,7 @@ struct regular_void {
     auto operator<=>(const regular_void &) const = default;
 };
 
-constexpr auto regularize_void(auto f) {
+constexpr auto regularized_void(auto f) {
     return [=](auto... args) mutable {
         using result_t = decltype(f(args...));
 
@@ -22,7 +22,7 @@ constexpr auto regularize_void(auto f) {
     };
 }
 
-constexpr auto unregularize_void(auto f) {
+constexpr auto unregularized_void(auto f) {
     return [=](auto... args) mutable {
         using result_t = decltype(f(args...));
 
