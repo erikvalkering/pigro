@@ -10,17 +10,7 @@
 #include <optional>
 #include <utility>
 
-namespace pigro::detail {
-
-template<typename T>
-struct LazyResult {
-    T value;
-    bool is_changed;
-};
-
-template<typename T>
-LazyResult(const T &, bool) -> LazyResult<const T &>;
-LazyResult(int &&, bool)->LazyResult<int>;
+namespace pigro::concepts {
 
 template<typename T>
 concept lazy_result = requires(T t) {
@@ -34,15 +24,29 @@ concept lazy_function = requires(F f) {
         -> lazy_result;
 };
 
-constexpr auto value = [](const lazy_result auto result) {
+} // namespace pigro::concepts
+
+namespace pigro::detail {
+
+template<typename T>
+struct LazyResult {
+    T value;
+    bool is_changed;
+};
+
+template<typename T>
+LazyResult(const T &, bool) -> LazyResult<const T &>;
+LazyResult(int &&, bool)->LazyResult<int>;
+
+constexpr auto value = [](const concepts::lazy_result auto result) {
     return result.value;
 };
 
-constexpr auto is_changed = [](const lazy_result auto result) {
+constexpr auto is_changed = [](const concepts::lazy_result auto result) {
     return result.is_changed;
 };
 
-constexpr auto unwrap_value(lazy_function auto lazy_f) {
+constexpr auto unwrap_value(concepts::lazy_function auto lazy_f) {
     return recursive{
         overload{
           [=](auto &, std::nullptr_t) mutable {
@@ -55,7 +59,7 @@ constexpr auto unwrap_value(lazy_function auto lazy_f) {
     };
 }
 
-constexpr auto lazy(auto f, lazy_function auto... deps) {
+constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
     auto ff = regularize_void(f);
 
     using result_t = decltype(ff(deps(nullptr).value...));
@@ -89,11 +93,11 @@ constexpr auto lazy_value(auto value, auto changed) {
     };
 };
 
-constexpr auto ensure_lazy(lazy_function auto dep) {
+constexpr auto ensure_lazy(concepts::lazy_function auto dep) {
     return dep;
 }
 
-constexpr auto ensure_lazy(std::invocable auto dep) {
+constexpr auto ensure_lazy(::std::invocable auto dep) {
     return detail::lazy(
       [=](auto) mutable { return dep(); },
       lazy_value(0, std::true_type{}));
