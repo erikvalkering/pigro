@@ -22,14 +22,17 @@ constexpr auto regularize_void(auto f) {
     };
 };
 
-constexpr auto unregularize_void(auto value) {
-    using value_t = std::remove_cvref_t<decltype(value)>;
+constexpr auto unregularize_void(auto f) {
+    return [=](auto... args) mutable {
+        using result_t = decltype(f(args...));
 
-    if constexpr (std::same_as<value_t, regular_void>) {
-        return;
-    } else {
-        return value;
-    }
+        if constexpr (std::same_as<result_t, regular_void>) {
+            f(args...);
+            return;
+        } else {
+            return f(args...);
+        }
+    };
 };
 
 } // namespace pigro

@@ -55,9 +55,9 @@ constexpr auto unwrap_value(concepts::lazy_function auto f) {
           [=](auto &, std::nullptr_t) mutable {
               return f(nullptr);
           },
-          [](auto &self) {
-              return unregularize_void(self(nullptr).value);
-          },
+          unregularize_void([](auto &self) {
+              return self(nullptr).value;
+          }),
         }
     };
 }
