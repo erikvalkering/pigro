@@ -24,6 +24,9 @@ concept lazy_function = requires(F f) {
         -> lazy_result;
 };
 
+template<typename F>
+concept lazy_function_unwrapped = lazy_function<F> && ::std::invocable<F>;
+
 } // namespace pigro::concepts
 
 namespace pigro::detail {
@@ -93,7 +96,7 @@ constexpr auto lazy_value(auto value, auto changed) {
     };
 };
 
-constexpr auto ensure_lazy(concepts::lazy_function auto dep) {
+constexpr auto ensure_lazy(concepts::lazy_function_unwrapped auto dep) {
     return dep;
 }
 
