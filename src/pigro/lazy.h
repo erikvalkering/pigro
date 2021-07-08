@@ -55,26 +55,24 @@ constexpr auto unwrap_value(concepts::lazy_function auto f) {
           [=](auto &, std::nullptr_t) mutable {
               return f(nullptr);
           },
-          unregularized_void([](auto &self) {
+          [](auto &self) {
               return self(nullptr).value;
-          }),
+          },
         }
     };
 }
 
 constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
-    auto ff = regularized_void(f);
-
-    using result_t = decltype(ff(deps(nullptr).value...));
+    using result_t = decltype(f(deps(nullptr).value...));
 
     auto cache = std::optional<result_t>{};
-    return unwrap_value([=](std::nullptr_t) mutable {
+    return [=](std::nullptr_t) mutable {
         const auto args = std::tuple{ deps(nullptr)... };
 
         auto changed = !cache || any(args, is_changed);
         if (changed) {
             const auto values = transform(args, value);
-            const auto result = apply(ff, values);
+            const auto result = apply(f, values);
 
             changed = cache != result;
             cache = std::move(result);
@@ -84,7 +82,7 @@ constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
             *cache,
             changed,
         };
-    });
+    };
 }
 
 constexpr auto lazy_value(auto value, auto changed) {
@@ -115,7 +113,12 @@ constexpr auto ensure_lazy(auto dep) {
 namespace pigro {
 
 auto lazy(auto f, auto... deps) {
-    return detail::lazy(f, detail::ensure_lazy(deps)...);
+    auto lazy_f = detail::lazy(
+      regularized_void(f),
+      detail::ensure_lazy(deps)...);
+
+    auto unwrapped_lazy_f = detail::unwrap_value(lazy_f);
+    return unregularized_void(unwrapped_lazy_f);
 }
 
 } // namespace pigro
