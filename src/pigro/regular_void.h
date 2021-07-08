@@ -20,7 +20,7 @@ constexpr auto regularize_void(auto f) {
             return f(args...);
         }
     };
-};
+}
 
 constexpr auto unregularize_void(auto f) {
     return [=](auto... args) mutable {
@@ -33,7 +33,7 @@ constexpr auto unregularize_void(auto f) {
             return f(args...);
         }
     };
-};
+}
 
 } // namespace pigro
 
