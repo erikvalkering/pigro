@@ -8,7 +8,7 @@
 #include <optional>
 #include <utility>
 
-namespace pigro {
+namespace pigro::detail {
 
 template<typename T>
 struct LazyResult {
@@ -75,7 +75,7 @@ constexpr auto ensure_lazy(lazy_function auto dep) {
 }
 
 constexpr auto ensure_lazy(std::invocable auto dep) {
-    return lazy(
+    return detail::lazy(
       [=](auto) mutable { return dep(); },
       lazy_value(0, std::true_type{}));
 }
@@ -84,8 +84,12 @@ constexpr auto ensure_lazy(auto dep) {
     return lazy_value(dep, std::false_type{});
 }
 
+} // namespace pigro::detail
+
+namespace pigro {
+
 auto lazy(auto f, auto dep) {
-    return lazy(f, ensure_lazy(dep));
+    return detail::lazy(f, detail::ensure_lazy(dep));
 }
 
 } // namespace pigro
