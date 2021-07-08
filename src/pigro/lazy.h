@@ -49,11 +49,11 @@ constexpr auto is_changed = [](const concepts::lazy_result auto result) {
     return result.is_changed;
 };
 
-constexpr auto unwrap_value(concepts::lazy_function auto lazy_f) {
+constexpr auto unwrap_value(concepts::lazy_function auto f) {
     return recursive{
         overload{
           [=](auto &, std::nullptr_t) mutable {
-              return lazy_f(nullptr);
+              return f(nullptr);
           },
           [](auto &self) {
               return unregularize_void(self(nullptr).value);
