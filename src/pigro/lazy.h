@@ -70,18 +70,14 @@ constexpr auto lazy_value(auto value, auto changed) {
     };
 };
 
-constexpr auto lazy_always_reevaluate(std::invocable auto f) {
-    return lazy(
-      [=](auto) mutable { return f(); },
-      lazy_value(0, std::true_type{}));
-};
-
 constexpr auto ensure_lazy(lazy_function auto dep) {
     return dep;
 }
 
 constexpr auto ensure_lazy(std::invocable auto dep) {
-    return lazy_always_reevaluate(dep);
+    return lazy(
+      [=](auto) mutable { return dep(); },
+      lazy_value(0, std::true_type{}));
 }
 
 constexpr auto ensure_lazy(auto dep) {
