@@ -9,10 +9,12 @@ namespace pigro::tests {
 
 struct Empty {
     auto operator<=>(const Empty &) const = default;
-} empty;
+};
 
 suite uncapture_tests = [] {
-    "uncapture"_test = [] {
+    auto empty = Empty{};
+
+    "uncapture"_test = [=] {
         expect(constant<std::is_empty_v<decltype(empty)>>);
 
         auto f1 = [] { return 0; };
@@ -28,13 +30,13 @@ suite uncapture_tests = [] {
         expect(constant<std::is_empty_v<decltype(f3)>>);
     };
 
-    "extra_parameters"_test = [] {
+    "extra_parameters"_test = [=] {
         auto f = uncaptured(empty) >> [](int, Empty) { return 0; };
         expect(f(0) == 0_i);
         expect(constant<std::is_empty_v<decltype(f)>>);
     };
 
-    "variadic"_test = [] {
+    "variadic"_test = [=] {
         auto f1 = uncaptured(empty, empty, empty) >> [](auto...) { return 0; };
         expect(f1(0) == 0_i);
         expect(constant<std::is_empty_v<decltype(f1)>>);
