@@ -51,8 +51,8 @@ struct Uncaptured<T> {
 template<typename U, typename F>
 struct CompressedInvocable : private U
   , F {
-    auto operator()() const {
-        return F::operator()(U::get_value());
+    auto operator()(auto &&...args) const {
+        return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
     }
 
     CompressedInvocable(U u, F f) : U{ u }, F{ f } {};
