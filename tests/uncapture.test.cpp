@@ -42,7 +42,7 @@ suite uncapture_tests = [] {
         expect(constant<std::is_empty_v<decltype(f1)>>);
 
         auto f2 = uncaptured(1, 10, 100) >> [](int a, int b, int c) { return c - b - a; };
-        expect(f2(0) == 100 - 10 - 1);
+        expect(f2() == 100 - 10 - 1);
         expect(constant<!std::is_empty_v<decltype(f2)>>);
     };
 };
