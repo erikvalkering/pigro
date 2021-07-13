@@ -40,6 +40,12 @@ suite uncapture_tests = [] {
         expect(constant<std::is_empty_v<decltype(f2)>>);
     };
 
+    "mutable"_test = [=] {
+        auto f = uncaptured(empty) >> [](Empty) mutable { return 0; };
+        expect(f() == 0_i);
+        expect(constant<std::is_empty_v<decltype(f)>>);
+    };
+
     "variadic"_test = [=] {
         auto f1 = uncaptured(empty) >> (uncaptured(empty) >> (uncaptured(empty) >> [](auto...) { return 0; }));
         expect(f1(0) == 0_i);
