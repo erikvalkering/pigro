@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+
 #include <tuple>
 #include <type_traits>
 
@@ -54,13 +56,13 @@ struct CompressedInvocable : private U
   , F {
     constexpr static auto unique_tag = tag;
 
-    auto operator()(auto &&...args) const {
-        return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
-    }
+    template<typename... Args>
+    auto operator()(Args &&...args) const
+      SFINAEABLE_RETURN(F::operator()(std::forward<decltype(args)>(args)..., U::get_value()));
 
-    auto operator()(auto &&...args) {
-        return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
-    }
+    template<typename... Args>
+    auto operator()(Args &&...args)
+      SFINAEABLE_RETURN(F::operator()(std::forward<decltype(args)>(args)..., U::get_value()));
 
     CompressedInvocable(U u, F f) : U{ u }, F{ f } {};
 };
