@@ -9,6 +9,9 @@ using namespace std;
 
 namespace pigro::tests {
 
+struct foo {};
+struct bar {};
+
 suite recursive_overload_tests = [] {
     "recursive_overload"_test = [] {
         const auto f = recursive{ overload{
@@ -35,6 +38,19 @@ suite recursive_overload_tests = [] {
         } };
 
         expect(k() == 0_i);
+    };
+
+    "sfinae_friendly"_test = [] {
+        auto f =
+          overload{
+              recursive{
+                [](auto self, foo) { return 0; } },
+              recursive{
+                [](auto self, bar) { return 1; } },
+          };
+
+        expect(f(foo{}) == 0_i);
+        expect(f(bar{}) == 1_i);
     };
 };
 
