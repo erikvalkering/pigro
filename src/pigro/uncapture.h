@@ -34,23 +34,25 @@ struct empty_object {
 template<typename T>
 concept empty = std::is_empty_v<T>;
 
-template<typename T>
+template<typename T, size_t tag = 0>
 struct Uncaptured {
     T value;
 
     auto get_value() const { return value; }
 };
 
-template<empty T>
-struct Uncaptured<T> {
+template<empty T, size_t tag>
+struct Uncaptured<T, tag> {
     Uncaptured(T) {}
 
     auto get_value() const { return empty_object<T>::get(); }
 };
 
-template<typename U, typename F>
+template<typename U, typename F, size_t tag>
 struct CompressedInvocable : private U
   , F {
+    constexpr static auto unique_tag = tag;
+
     auto operator()(auto &&...args) const {
         return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
     }
@@ -58,9 +60,21 @@ struct CompressedInvocable : private U
     CompressedInvocable(U u, F f) : U{ u }, F{ f } {};
 };
 
+template<typename F>
+struct unique_tag { constexpr static auto value = 0; };
+
+template<typename U, typename F, size_t tag>
+struct unique_tag<CompressedInvocable<U, F, tag>> {
+    constexpr static auto value = tag;
+};
+
+template<typename F>
+constexpr auto unique_tag_v = unique_tag<F>::value;
+
 template<typename T, typename F>
 auto operator>>(Uncaptured<T> u, F f) {
-    return CompressedInvocable<Uncaptured<T>, F>{ u, f };
+    constexpr auto unique_tag = unique_tag_v<F> + 1;
+    return CompressedInvocable<Uncaptured<T, unique_tag>, F, unique_tag>{ Uncaptured<T, unique_tag>{ u.get_value() }, f };
 }
 
 } // namespace pigro::detail
