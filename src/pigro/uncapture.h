@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 
 namespace pigro::detail {
@@ -77,12 +78,29 @@ auto operator>>(Uncaptured<T> u, F f) {
     return CompressedInvocable<Uncaptured<T, unique_tag>, F, unique_tag>{ Uncaptured<T, unique_tag>{ u.get_value() }, f };
 }
 
+template<typename T>
+struct mytuple {
+    T data;
+};
+
+template<typename T, typename F>
+auto operator>>(mytuple<T> values_, F f) {
+    return std::apply([](auto f, auto... values) {
+        return (values >> ... >> f);
+    },
+      std::tuple_cat(std::tuple{ f }, values_.data));
+}
+
 } // namespace pigro::detail
 
 namespace pigro {
 
 auto uncaptured(auto value) {
     return detail::Uncaptured<decltype(value)>{ value };
+}
+
+auto uncaptured(auto... values) {
+    return detail::mytuple{ std::tuple{ detail::Uncaptured<decltype(values)>{ values }... } };
 }
 
 } // namespace pigro
