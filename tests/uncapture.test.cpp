@@ -1,4 +1,5 @@
 #include "../src/pigro/uncapture.h"
+#include "../src/pigro/overload.h"
 
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
@@ -43,6 +44,17 @@ suite uncapture_tests = [] {
     "mutable"_test = [=] {
         auto f = uncaptured(empty) >> [](Empty) mutable { return 0; };
         expect(f() == 0_i);
+        expect(constant<std::is_empty_v<decltype(f)>>);
+    };
+
+    "sfinae_friendly"_test = [=] {
+        auto f = overload{
+            uncaptured(empty) >> [](std::nullptr_t, Empty) { return 0; },
+            [](int) { return 1; },
+        };
+
+        expect(f(nullptr) == 0_i);
+        expect(f(0) == 1_i);
         expect(constant<std::is_empty_v<decltype(f)>>);
     };
 
