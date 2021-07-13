@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+
 #include <utility>
 
 namespace pigro {
@@ -7,14 +9,12 @@ namespace pigro {
 template<typename F>
 struct recursive : F {
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) const {
-        return F::operator()(*this, std::forward<Args>(args)...);
-    }
+    constexpr auto operator()(Args &&...args) const
+      SFINAEABLE_RETURN(F::operator()(*this, std::forward<Args>(args)...));
 
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) {
-        return F::operator()(*this, std::forward<Args>(args)...);
-    }
+    constexpr auto operator()(Args &&...args)
+      SFINAEABLE_RETURN(F::operator()(*this, std::forward<Args>(args)...));
 };
 
 template<typename F>
