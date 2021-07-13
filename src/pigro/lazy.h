@@ -52,7 +52,7 @@ constexpr auto is_changed = [](const concepts::lazy_result auto result) {
 constexpr auto unwrap_value(concepts::lazy_function auto f) {
     return recursive{
         overload{
-          [=](auto &, std::nullptr_t) mutable {
+          [=](auto &self, std::nullptr_t) mutable {
               return f(nullptr);
           },
           [](auto &self) {
