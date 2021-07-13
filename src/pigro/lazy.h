@@ -4,6 +4,7 @@
 #include "recursive.h"
 #include "regular_void.h"
 #include "tuple_algorithms.h"
+#include "uncapture.h"
 
 #include <concepts>
 #include <cstddef>
@@ -52,9 +53,7 @@ constexpr auto is_changed = [](const concepts::lazy_result auto result) {
 constexpr auto unwrap_value(concepts::lazy_function auto f) {
     return recursive{
         overload{
-          [=](auto &self, std::nullptr_t) mutable {
-              return f(nullptr);
-          },
+          uncaptured(f) >> [](auto &self, std::nullptr_t, auto f) mutable { return f(nullptr); },
           [](auto &self) mutable {
               return self(nullptr).value;
           },
@@ -66,7 +65,7 @@ constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
     using result_t = decltype(f(deps(nullptr).value...));
 
     auto cache = std::optional<result_t>{};
-    return [=](std::nullptr_t) mutable {
+    return uncaptured(f, deps...) >> [=](std::nullptr_t, auto f, auto... deps) mutable {
         const auto args = std::tuple{ deps(nullptr)... };
 
         auto changed = !cache || any(args, is_changed);
@@ -86,7 +85,7 @@ constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
 }
 
 constexpr auto lazy_value(auto value, auto changed) {
-    return [=](std::nullptr_t) {
+    return uncaptured(value, changed) >> [](std::nullptr_t, auto value, auto changed) {
         return LazyResult{
             value,
             changed,
@@ -100,7 +99,7 @@ constexpr auto ensure_lazy(concepts::lazy_function_unwrapped auto dep) {
 
 constexpr auto ensure_lazy(::std::invocable auto dep) {
     return detail::lazy(
-      [=](auto) mutable { return dep(); },
+      uncaptured(dep) >> [](auto, auto dep) mutable { return dep(); },
       lazy_value(0, std::true_type{}));
 }
 
