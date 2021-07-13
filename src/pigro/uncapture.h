@@ -58,6 +58,10 @@ struct CompressedInvocable : private U
         return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
     }
 
+    auto operator()(auto &&...args) {
+        return F::operator()(std::forward<decltype(args)>(args)..., U::get_value());
+    }
+
     CompressedInvocable(U u, F f) : U{ u }, F{ f } {};
 };
 
