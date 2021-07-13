@@ -3,7 +3,6 @@ add_executable(tests
 	overload.test.cpp
 	partition.test.cpp
 	recursive.test.cpp
-	recursive_overload.test.cpp
 	regular_void.test.cpp
 	tests.cpp
 	tuple_algorithms.test.cpp

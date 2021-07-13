@@ -1,4 +1,5 @@
 #include "../src/pigro/recursive.h"
+#include "../src/pigro/overload.h"
 
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
@@ -7,6 +8,9 @@ using namespace boost::ut;
 using namespace std;
 
 namespace pigro::tests {
+
+struct foo {};
+struct bar {};
 
 suite recursive_tests = [] {
     "recursive"_test = [] {
@@ -25,6 +29,46 @@ suite recursive_tests = [] {
 
         static_assert(sizeof(fibonacci) == sizeof(char));
         static_assert(std::is_empty_v<decltype(fibonacci)>);
+    };
+
+    "recursive_overload"_test = [] {
+        const auto f = recursive{ overload{
+          [](auto self, int) { return "int"s; },
+          [](auto self, double) { return "double"s; },
+          [](auto self, auto) { return "auto"s; },
+          [](auto self, string) { return self(0); },
+        } };
+
+        expect(f(0) == "int"s);
+        expect(f(0.0) == "double"s);
+        expect(f(true) == "auto"s);
+        expect(f("a"s) == "int"s);
+
+        const auto g = [] { return 0; };
+        const auto h = recursive{ overload{
+          [=](auto self) { return g(); },
+        } };
+
+        expect(h() == 0_i);
+
+        auto k = recursive{ overload{
+          [](auto self) mutable { return 0; },
+        } };
+
+        expect(k() == 0_i);
+    };
+
+    "sfinae_friendly"_test = [] {
+        auto f =
+          overload{
+              recursive{
+                [](auto self, foo) { return 0; } },
+              recursive{
+                [](auto self, bar) { return 1; } },
+          };
+
+        expect(f(foo{}) == 0_i);
+        expect(f(bar{}) == 1_i);
     };
 };
 
