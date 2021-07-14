@@ -4,6 +4,7 @@ add_executable(tests
 	partition.test.cpp
 	recursive.test.cpp
 	recursive_overload.test.cpp
+	regular_void.test.cpp
 	tests.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
