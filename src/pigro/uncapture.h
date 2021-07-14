@@ -41,7 +41,8 @@ template<typename T, size_t tag = 0>
 struct Uncaptured {
     T value;
 
-    auto get_value() const { return value; }
+    auto &get_value() const { return value; }
+    auto &get_value() { return value; }
 };
 
 template<empty T, size_t tag>
