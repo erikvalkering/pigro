@@ -75,6 +75,15 @@ suite uncapture_tests = [] {
         expect(f4() == 100 - 10 - 1);
         expect(constant<!std::is_empty_v<decltype(f4)>>);
     };
+
+    "remember_state"_test = [=] {
+        auto x = 0;
+        auto f2 = uncaptured(x) >> [](auto &&x) { return x++; };
+
+        expect(f2() == 0_i);
+        expect(f2() == 1_i);
+        expect(f2() == 2_i);
+    };
 };
 
 } // namespace pigro::tests
