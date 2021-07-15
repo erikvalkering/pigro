@@ -58,6 +58,10 @@ suite overload_tests = [] {
         static_assert(!is_empty_v<decltype(r5)>);
         static_assert(sizeof(r5) == 2 * sizeof(int));
     };
+
+    "empty"_test = [] {
+        auto f = overload{};
+    };
 };
 
 } // namespace pigro::tests
