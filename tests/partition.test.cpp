@@ -38,6 +38,10 @@ suite partition_tests = [] {
             float,
             int>{});
     };
+
+    "empty"_test = [] {
+        expect(partition(typelist<>{}, predicate<std::is_empty>) == typelist<>{});
+    };
 };
 
 } // namespace pigro::tests
