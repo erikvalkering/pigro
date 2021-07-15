@@ -28,7 +28,7 @@ constexpr auto operator+(
 
 template<typename... TypeLists>
 constexpr auto concat(TypeLists... typelists) {
-    return (typelists + ...);
+    return (typelists + ... + typelist<>{});
 }
 
 template<
