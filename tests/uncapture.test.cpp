@@ -84,11 +84,11 @@ suite uncapture_tests = [] {
 
     "remember_state"_test = [=] {
         auto x = 0;
-        auto f2 = uncaptured(x) >> [](auto &&x) { return x++; };
+        auto f = uncaptured(x) >> [](auto &&x) { return x++; };
 
-        expect(f2() == 0_i);
-        expect(f2() == 1_i);
-        expect(f2() == 2_i);
+        expect(f() == 0_i);
+        expect(f() == 1_i);
+        expect(f() == 2_i);
     };
 
     "size"_test = [=] {
