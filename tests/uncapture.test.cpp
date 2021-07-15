@@ -76,6 +76,12 @@ suite uncapture_tests = [] {
         expect(constant<!std::is_empty_v<decltype(f4)>>);
     };
 
+    "zero_args"_test = [] {
+        auto f = uncaptured() >> []() { return 0; };
+
+        expect(f() == 0_i);
+    };
+
     "remember_state"_test = [=] {
         auto x = 0;
         auto f2 = uncaptured(x) >> [](auto &&x) { return x++; };
