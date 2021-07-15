@@ -28,6 +28,9 @@ struct __declspec(empty_bases) overload : overload_impl<partition_t<std::is_empt
     template<typename... Gs>
     explicit overload(std::tuple<Fs...> args, typelist<Gs...>) : base{ std::get<Gs>(args)... } {}
 };
+
+template<>
+struct overload<> {};
 #else
 template<typename... Fs>
 struct overload : Fs... {
