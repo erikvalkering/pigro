@@ -93,17 +93,23 @@ suite uncapture_tests = [] {
 
     "only_uncaptured"_test = [=] {
         auto f1 = uncaptured();
+        expect(constant<sizeof(f1) == sizeof(empty)>);
+        expect(constant<std::is_empty_v<decltype(f1)>>);
 
         auto x = 1;
         auto f2 = uncaptured(x);
 
         expect(f2(std::integral_constant<size_t, 0>{}) == x);
+        expect(constant<sizeof(f2) == sizeof(x)>);
+        expect(constant<!std::is_empty_v<decltype(f2)>>);
 
         auto y = 2.0;
         auto f3 = uncaptured(x, y);
 
         expect(f3(std::integral_constant<size_t, 0>{}) == x);
         expect(f3(std::integral_constant<size_t, 1>{}) == y);
+        expect(constant<sizeof(f3) == sizeof(double) + sizeof(y)>);
+        expect(constant<!std::is_empty_v<decltype(f3)>>);
     };
 
     "size"_test = [=] {
