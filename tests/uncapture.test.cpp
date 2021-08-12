@@ -91,6 +91,21 @@ suite uncapture_tests = [] {
         expect(f() == 2_i);
     };
 
+    "only_uncaptured"_test = [=] {
+        auto f1 = uncaptured();
+
+        auto x = 1;
+        auto f2 = uncaptured(x);
+
+        expect(f2(std::integral_constant<size_t, 0>{}) == x);
+
+        auto y = 2.0;
+        auto f3 = uncaptured(x, y);
+
+        expect(f3(std::integral_constant<size_t, 0>{}) == x);
+        expect(f3(std::integral_constant<size_t, 1>{}) == y);
+    };
+
     "size"_test = [=] {
         auto x = 1;
 
