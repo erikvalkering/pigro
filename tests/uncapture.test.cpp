@@ -121,7 +121,7 @@ suite uncapture_tests = [] {
 
         expect(f5(std::integral_constant<size_t, 0>{}) == empty);
         expect(f5(std::integral_constant<size_t, 1>{}) == y);
-        expect(constant<sizeof(f5) == sizeof(empty) + sizeof(double)>);
+        expect(constant<sizeof(f5) == 0 + sizeof(double)>);
         expect(constant<!std::is_empty_v<decltype(f5)>>);
     };
 
