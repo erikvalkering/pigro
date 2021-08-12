@@ -110,6 +110,19 @@ suite uncapture_tests = [] {
         expect(f3(std::integral_constant<size_t, 1>{}) == y);
         expect(constant<sizeof(f3) == sizeof(double) + sizeof(double)>);
         expect(constant<!std::is_empty_v<decltype(f3)>>);
+
+        auto f4 = uncaptured(empty);
+
+        expect(f4(std::integral_constant<size_t, 0>{}) == empty);
+        expect(constant<sizeof(f4) == sizeof(empty)>);
+        expect(constant<std::is_empty_v<decltype(f4)>>);
+
+        auto f5 = uncaptured(empty, y);
+
+        expect(f5(std::integral_constant<size_t, 0>{}) == empty);
+        expect(f5(std::integral_constant<size_t, 1>{}) == y);
+        expect(constant<sizeof(f5) == sizeof(empty) + sizeof(double)>);
+        expect(constant<!std::is_empty_v<decltype(f5)>>);
     };
 
     "size"_test = [=] {
