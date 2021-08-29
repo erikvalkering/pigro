@@ -11,25 +11,6 @@
 #include <optional>
 #include <utility>
 
-namespace pigro::concepts {
-
-template<typename T>
-concept lazy_result = requires(T t) {
-    t.value;
-    t.is_changed;
-};
-
-template<typename F>
-concept lazy_function = requires(F f) {
-    { f(nullptr) }
-        -> lazy_result;
-};
-
-template<typename F>
-concept lazy_function_unwrapped = lazy_function<F> && ::std::invocable<F>;
-
-} // namespace pigro::concepts
-
 namespace pigro::detail {
 
 template<typename T>

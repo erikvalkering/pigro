@@ -1,5 +1,6 @@
 #pragma once
 
+#include "concepts.h"
 #include "utils.h"
 
 #include <tuple>
@@ -33,9 +34,6 @@ struct empty_object {
         return *t;
     }
 };
-
-template<typename T>
-concept empty = std::is_empty_v<T>;
 
 template<typename T, size_t tag = 0>
 struct Uncaptured {
