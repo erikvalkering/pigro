@@ -69,7 +69,7 @@ suite uncapture_tests = [] {
         expect(constant<!std::is_empty_v<decltype(f2)>>);
 
         auto f3 = uncaptured(empty) >> [](auto empty) { return empty; };
-        expect(f2() == empty);
+        expect(f3() == empty);
         expect(constant<std::is_empty_v<decltype(f3)>>);
     };
 
