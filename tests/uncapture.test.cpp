@@ -16,6 +16,47 @@ struct Empty {
 suite uncapture_tests = [] {
     auto empty = Empty{};
 
+    "only_uncaptured"_test = [=] {
+        auto f1 = uncaptured();
+        expect(constant<sizeof(f1) == sizeof(empty)>);
+        expect(constant<std::is_empty_v<decltype(f1)>>);
+
+        auto x = int{ 1 };
+        auto f2 = uncaptured(x);
+
+        expect(f2(std::integral_constant<size_t, 0>{}) == x);
+        expect(constant<sizeof(f2) == sizeof(int)>);
+        expect(constant<!std::is_empty_v<decltype(f2)>>);
+
+        auto y = double{ 2.0 };
+        auto f3 = uncaptured(x, y);
+
+        expect(f3(std::integral_constant<size_t, 0>{}) == x);
+        expect(f3(std::integral_constant<size_t, 1>{}) == y);
+        expect(constant<sizeof(f3) == sizeof(double) + sizeof(double)>);
+        expect(constant<!std::is_empty_v<decltype(f3)>>);
+
+        auto f4 = uncaptured(empty);
+
+        expect(f4(std::integral_constant<size_t, 0>{}) == empty);
+        expect(constant<sizeof(f4) == sizeof(empty)>);
+        expect(constant<std::is_empty_v<decltype(f4)>>);
+
+        auto f5 = uncaptured(empty, y);
+
+        expect(f5(std::integral_constant<size_t, 0>{}) == empty);
+        expect(f5(std::integral_constant<size_t, 1>{}) == y);
+        expect(constant<sizeof(f5) == 0 + sizeof(double)>);
+        expect(constant<!std::is_empty_v<decltype(f5)>>);
+
+        auto f6 = uncaptured(y, empty);
+
+        expect(f6(std::integral_constant<size_t, 0>{}) == y);
+        expect(f6(std::integral_constant<size_t, 1>{}) == empty);
+        expect(constant<sizeof(f6) == sizeof(double) + 0>);
+        expect(constant<!std::is_empty_v<decltype(f6)>>);
+    };
+
     "uncapture"_test = [=] {
         expect(constant<std::is_empty_v<decltype(empty)>>);
 
@@ -90,47 +131,6 @@ suite uncapture_tests = [] {
         expect(f() == 0_i);
         expect(f() == 1_i);
         expect(f() == 2_i);
-    };
-
-    "only_uncaptured"_test = [=] {
-        auto f1 = uncaptured();
-        expect(constant<sizeof(f1) == sizeof(empty)>);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
-
-        auto x = int{ 1 };
-        auto f2 = uncaptured(x);
-
-        expect(f2(std::integral_constant<size_t, 0>{}) == x);
-        expect(constant<sizeof(f2) == sizeof(int)>);
-        expect(constant<!std::is_empty_v<decltype(f2)>>);
-
-        auto y = double{ 2.0 };
-        auto f3 = uncaptured(x, y);
-
-        expect(f3(std::integral_constant<size_t, 0>{}) == x);
-        expect(f3(std::integral_constant<size_t, 1>{}) == y);
-        expect(constant<sizeof(f3) == sizeof(double) + sizeof(double)>);
-        expect(constant<!std::is_empty_v<decltype(f3)>>);
-
-        auto f4 = uncaptured(empty);
-
-        expect(f4(std::integral_constant<size_t, 0>{}) == empty);
-        expect(constant<sizeof(f4) == sizeof(empty)>);
-        expect(constant<std::is_empty_v<decltype(f4)>>);
-
-        auto f5 = uncaptured(empty, y);
-
-        expect(f5(std::integral_constant<size_t, 0>{}) == empty);
-        expect(f5(std::integral_constant<size_t, 1>{}) == y);
-        expect(constant<sizeof(f5) == 0 + sizeof(double)>);
-        expect(constant<!std::is_empty_v<decltype(f5)>>);
-
-        auto f6 = uncaptured(y, empty);
-
-        expect(f6(std::integral_constant<size_t, 0>{}) == y);
-        expect(f6(std::integral_constant<size_t, 1>{}) == empty);
-        expect(constant<sizeof(f6) == sizeof(double) + 0>);
-        expect(constant<!std::is_empty_v<decltype(f6)>>);
     };
 
     "size"_test = [=] {
