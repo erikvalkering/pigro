@@ -21,7 +21,7 @@ suite pack_algorithms_tests = [] {
             3,
             4,
             5)
-          == 10);
+          == 10_i);
 
         expect(
           enumerate_pack([](auto... items) {
@@ -32,7 +32,7 @@ suite pack_algorithms_tests = [] {
             3,
             4,
             5)
-          == 15);
+          == 15_i);
     };
 
     "tuple_should_remain_tuple"_test = [] {
@@ -62,14 +62,14 @@ suite pack_algorithms_tests = [] {
               return (decltype(items)::index + ...);
           },
             tuple{ 1, 2, 3, 4, 5 })
-          == 10);
+          == 10_i);
 
         expect(
           enumerate_tuple([](auto... items) {
               return (items.value + ...);
           },
             tuple{ 1, 2, 3, 4, 5 })
-          == 15);
+          == 15_i);
     };
 
     "enumerate_n"_test = [] {
