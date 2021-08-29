@@ -1,6 +1,7 @@
 add_executable(tests
 	lazy.test.cpp
 	overload.test.cpp
+	pack_algorithms.test.cpp
 	partition.test.cpp
 	recursive.test.cpp
 	regular_void.test.cpp
