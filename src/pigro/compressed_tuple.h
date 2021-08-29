@@ -29,7 +29,7 @@ auto make_compressed_tuple_base(auto... values) {
       [](auto... items) {
           return recursive{
               overload{
-                compressed_tuple_element<decltype(items)::index>(
+                compressed_tuple_element<items.index>(
                   items.value)... }
           };
       },

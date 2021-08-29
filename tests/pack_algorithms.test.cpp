@@ -25,6 +25,19 @@ suite pack_algorithms_tests = [] {
 
         expect(
           enumerate_pack([](auto... items) {
+              // the index can also be used as a constexpr value
+              constexpr auto sum = (items.index + ...);
+              return sum;
+          },
+            1,
+            2,
+            3,
+            4,
+            5)
+          == 10_i);
+
+        expect(
+          enumerate_pack([](auto... items) {
               return (items.value + ...);
           },
             1,
@@ -59,7 +72,7 @@ suite pack_algorithms_tests = [] {
     "enumerate_tuple"_test = [] {
         expect(
           enumerate_tuple([](auto... items) {
-              return (decltype(items)::index + ...);
+              return (items.index + ...);
           },
             tuple{ 1, 2, 3, 4, 5 })
           == 10_i);
@@ -75,7 +88,7 @@ suite pack_algorithms_tests = [] {
     "enumerate_n"_test = [] {
         expect(
           enumerate_n<5>([](auto... items) {
-              return (decltype(items)::index + ...);
+              return (items.index + ...);
           })
           == 10);
 
