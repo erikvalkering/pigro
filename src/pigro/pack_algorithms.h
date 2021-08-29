@@ -21,4 +21,12 @@ auto enumerate_tuple(auto f, auto t) {
     return std::apply([=](auto... pack) { return enumerate_pack(f, pack...); }, t);
 }
 
+template<size_t n>
+auto enumerate_n(auto f) {
+    return [=]<size_t... idx>(std::index_sequence<idx...>) {
+        return enumerate_pack(f, idx...);
+    }
+    (std::make_index_sequence<n>{});
+}
+
 } // namespace pigro

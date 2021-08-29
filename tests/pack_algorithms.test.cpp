@@ -50,6 +50,20 @@ suite pack_algorithms_tests = [] {
             tuple{ 1, 2, 3, 4, 5 })
           == 25);
     };
+
+    "enumerate_n"_test = [] {
+        expect(
+          enumerate_n<5>([](auto... items) {
+              return (decltype(items)::index + ...);
+          })
+          == 10);
+
+        expect(
+          enumerate_n<5>([](auto... items) {
+              return (items.value + ...);
+          })
+          == 10);
+    };
 };
 
 } // namespace pigro::tests
