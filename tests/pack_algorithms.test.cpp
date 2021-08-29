@@ -35,6 +35,27 @@ suite pack_algorithms_tests = [] {
           == 15);
     };
 
+    "tuple_should_remain_tuple"_test = [] {
+        // Before, the implementation of enumerate_pack
+        // would use std::tuple{ pack... } to create the
+        // tuple. However, when pack is a single tuple,
+        // this would not result in a std::tuple{std::tuple},
+        // but simply invoke the copy constructor.
+        // As a result, the tuple's elements would be
+        // enumerated, instead of the tuple as a whole.
+        // In order to enumerate a tuple, you should use
+        // enumerate_tuple().
+        //
+        // This test ensures that when we enumerate over a single
+        // tuple, we get back the tuple.
+        expect(
+          enumerate_pack([](auto... items) {
+              return (items.value + ...);
+          },
+            tuple{ 1, 2, 3, 4, 5 })
+          == tuple{ 1, 2, 3, 4, 5 });
+    };
+
     "enumerate_tuple"_test = [] {
         expect(
           enumerate_tuple([](auto... items) {
