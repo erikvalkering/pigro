@@ -25,9 +25,8 @@ concept empty = std::is_empty_v<T>;
 
 template<std::size_t I, class T>
 concept has_tuple_element =
-  requires(T t) {
-    typename std::tuple_element_t<I, std::remove_const_t<T>>;
-    { get<I>(t) } -> std::convertible_to<std::tuple_element_t<I, T> &>;
+  requires {
+    typename std::tuple_element<I, std::remove_const_t<T>>::type;
 };
 
 template<class T>
