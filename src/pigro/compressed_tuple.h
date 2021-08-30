@@ -56,7 +56,7 @@ struct tuple_size<pigro::compressed_tuple<Ts...>>
 };
 
 template<size_t I, typename... Ts>
-constexpr auto &&get(pigro::compressed_tuple<Ts...> t) {
+constexpr decltype(auto) get(pigro::compressed_tuple<Ts...> t) {
     return t(pigro::idx<I>);
 }
 
