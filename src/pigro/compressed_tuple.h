@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concepts.h"
+#include "empty_object.h"
 #include "overload.h"
 #include "recursive.h"
 #include "utils.h"
@@ -9,10 +10,10 @@
 
 namespace pigro {
 
-template<size_t tag>
-auto compressed_tuple_element(concepts::empty auto value) {
+template<size_t tag, concepts::empty T>
+auto compressed_tuple_element(T value) {
     return [](auto &&self, idx_t<tag>) {
-        return decltype(value){};
+            return empty_object<T>::get();
     };
 }
 
