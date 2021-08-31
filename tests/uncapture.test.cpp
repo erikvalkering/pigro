@@ -16,22 +16,6 @@ struct Empty {
 suite uncapture_tests = [] {
     auto empty = Empty{};
 
-    "uncapture"_test = [=] {
-        expect(constant<std::is_empty_v<decltype(empty)>>);
-
-        auto f1 = [] { return 0; };
-        expect(f1() == 0_i);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
-
-        auto f2 = [=] { return empty; };
-        expect(f2() == empty);
-        expect(constant<!std::is_empty_v<decltype(f2)>>);
-
-        auto f3 = uncaptured(empty) >> [](auto empty) { return empty; };
-        expect(f3() == empty);
-        expect(constant<std::is_empty_v<decltype(f3)>>);
-    };
-
     "extra_parameters"_test = [=] {
         auto f1 = uncaptured(empty) >> [](int, Empty) { return 0; };
         expect(f1(0) == 0_i);
