@@ -4,6 +4,8 @@
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
 
+#include <type_traits>
+
 using namespace boost::ut;
 
 namespace pigro::tests {
