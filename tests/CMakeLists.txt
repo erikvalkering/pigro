@@ -1,4 +1,5 @@
 add_executable(tests
+	compressed_tuple.test.cpp
 	lazy.test.cpp
 	overload.test.cpp
 	pack_algorithms.test.cpp
