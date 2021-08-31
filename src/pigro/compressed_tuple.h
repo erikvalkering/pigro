@@ -3,38 +3,51 @@
 #include "concepts.h"
 #include "empty_object.h"
 #include "overload.h"
+#include "pack_algorithms.h"
 #include "recursive.h"
 #include "utils.h"
 
 #include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace pigro {
 
 template<size_t tag, concepts::empty T>
 auto compressed_tuple_element(T value) {
-    return [](auto &&self, idx_t<tag>) {
+    return overload{
+        [](const auto &self, idx_t<tag>) {
             return empty_object<T>::get();
+        },
+        [](auto &self, idx_t<tag>) mutable {
+            return empty_object<T>::get();
+        },
     };
 }
 
-template<size_t tag>
-auto compressed_tuple_element(auto value) {
-    return
-      [=](auto &&self, idx_t<tag>) mutable -> auto & {
-        return value;
-    };
+template<size_t tag, typename T>
+auto compressed_tuple_element(T &&value) {
+    return overload{
+        [](const auto &self, idx_t<tag>) -> const auto &{
+                                           using Self = std::remove_cvref_t<decltype(self)>;
+    return std::as_const(const_cast<Self &>(self)(idx<tag>));
+}
+,
+  [capture = std::tuple{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> auto & {
+    return std::get<0>(capture);
+}
+,
+}; // namespace pigro
 }
 
-auto make_compressed_tuple_base(auto... values) {
+auto make_compressed_tuple_base(auto &&...values) {
     return enumerate_pack(
-      [](auto... items) {
+      [](auto &&...items) {
           return recursive{
-              overload{
-                compressed_tuple_element<items.index>(
-                  items.value)... }
+              overload{ compressed_tuple_element<items.index>(std::forward<decltype(items)>(items).value)... }
           };
       },
-      values...);
+      std::forward<decltype(values)>(values)...);
 }
 
 template<typename... Ts>
@@ -42,10 +55,13 @@ using compressed_tuple_base_t = decltype(make_compressed_tuple_base(std::declval
 
 template<typename... Ts>
 struct compressed_tuple : compressed_tuple_base_t<Ts...> {
-    explicit compressed_tuple(Ts... values)
-      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(values...) } {
+    explicit compressed_tuple(Ts &&...values)
+      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(std::forward<decltype(values)>(values)...) } {
     }
 };
+
+template<typename... Ts>
+compressed_tuple(Ts &&...) -> compressed_tuple<Ts &&...>;
 
 } // namespace pigro
 
@@ -56,8 +72,28 @@ struct tuple_size<pigro::compressed_tuple<Ts...>>
   : std::integral_constant<size_t, sizeof...(Ts)> {
 };
 
+template<typename... Ts>
+struct tuple_size<const pigro::compressed_tuple<Ts...>>
+  : std::integral_constant<size_t, sizeof...(Ts)> {
+};
+
+template<typename... Ts>
+struct tuple_size<pigro::compressed_tuple<Ts...> &&>
+  : std::integral_constant<size_t, sizeof...(Ts)> {
+};
+
+template<typename... Ts>
+struct tuple_size<const pigro::compressed_tuple<Ts...> &&>
+  : std::integral_constant<size_t, sizeof...(Ts)> {
+};
+
 template<size_t I, typename... Ts>
-constexpr decltype(auto) get(pigro::compressed_tuple<Ts...> t) {
+constexpr decltype(auto) get(pigro::compressed_tuple<Ts...> &t) {
+    return t(pigro::idx<I>);
+}
+
+template<size_t I, typename... Ts>
+constexpr decltype(auto) get(const pigro::compressed_tuple<Ts...> &t) {
     return t(pigro::idx<I>);
 }
 
