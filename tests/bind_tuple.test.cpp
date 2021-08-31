@@ -37,6 +37,16 @@ suite bind_tuple_tests = [] {
         // TODO: test whether no copies are being made
         // TODO: test non-default-constructible types
     };
+
+    "extra_parameters"_test = [=] {
+        auto f1 = compressed_tuple{ empty } >> [](Empty, int) { return 0; };
+        expect(f1(0) == 0_i);
+        expect(constant<std::is_empty_v<decltype(f1)>>);
+
+        auto f2 = compressed_tuple{ empty } >> [](Empty, int, int) mutable { return 0; };
+        expect(f2(0, 0) == 0_i);
+        expect(constant<std::is_empty_v<decltype(f2)>>);
+    };
 };
 
 } // namespace pigro::tests

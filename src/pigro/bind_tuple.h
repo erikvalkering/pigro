@@ -11,13 +11,13 @@ auto bind_front_tuple(auto f, concepts::tuple_like auto t) {
         overload{
           compressed_tuple_element<0>(f),
           compressed_tuple_element<1>(t),
-          [](auto &&self) {
+          [](auto &&self, auto &&...args) {
               auto &&f = self(idx<0>);
               auto &&compressed_args = self(idx<1>);
 
               return enumerate_n<std::tuple_size_v<decltype(compressed_args)>>(
-                [=](auto... items) {
-                    return f(std::get<items.index>(compressed_args)...);
+                [&](auto... items) {
+                    return f(std::get<items.index>(compressed_args)..., std::forward<decltype(args)>(args)...);
                 });
           },
         }
