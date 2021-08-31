@@ -47,6 +47,18 @@ suite bind_tuple_tests = [] {
         expect(f2(0, 0) == 0_i);
         expect(constant<std::is_empty_v<decltype(f2)>>);
     };
+
+    "mutable"_test = [=] {
+        auto f = compressed_tuple{ empty } >> [](Empty) mutable { return 0; };
+        expect(f() == 0_i);
+        expect(constant<std::is_empty_v<decltype(f)>>);
+    };
+
+    "zero_args"_test = [] {
+        auto f = compressed_tuple{} >> []() { return 0; };
+
+        expect(f() == 0_i);
+    };
 };
 
 } // namespace pigro::tests
