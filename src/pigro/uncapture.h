@@ -1,39 +1,13 @@
 #pragma once
 
 #include "concepts.h"
+#include "empty_object.h"
 #include "utils.h"
 
 #include <tuple>
 #include <type_traits>
 
 namespace pigro::detail {
-
-template<typename T>
-struct empty_object {
-    struct T1 {
-        char c;
-    };
-    struct T2 : T {
-        char c;
-    };
-
-    union Storage {
-        constexpr Storage() : t1{} {}
-        T1 t1;
-        T2 t2;
-    };
-
-    static T get() {
-        Storage storage{};
-
-        const auto *c = &storage.t2.c;
-
-        auto t2 = reinterpret_cast<const T2 *>(c);
-        auto t = static_cast<const T *>(t2);
-
-        return *t;
-    }
-};
 
 template<typename T, size_t tag = 0>
 struct Uncaptured {
