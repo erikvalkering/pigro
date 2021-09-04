@@ -72,6 +72,15 @@ suite bind_tuple_tests = [] {
 
         expect(f() == 0_i);
     };
+
+    "remember_state"_test = [=] {
+        auto x = 0;
+        auto f = compressed_tuple{ x } >> [](auto &&x) mutable { return x++; };
+
+        expect(f() == 0_i);
+        expect(f() == 1_i);
+        expect(f() == 2_i);
+    };
 };
 
 } // namespace pigro::tests

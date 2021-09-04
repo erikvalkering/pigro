@@ -48,15 +48,6 @@ suite uncapture_tests = [] {
 
 
 
-    "remember_state"_test = [=] {
-        auto x = 0;
-        auto f = uncaptured(x) >> [](auto &&x) { return x++; };
-
-        expect(f() == 0_i);
-        expect(f() == 1_i);
-        expect(f() == 2_i);
-    };
-
     "size"_test = [=] {
         auto x = 1;
 
