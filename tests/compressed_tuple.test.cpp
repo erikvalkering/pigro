@@ -58,6 +58,11 @@ suite compressed_tuple_tests = [] {
         expect(constant<sizeof(t6) == sizeof(double) + 0>);
         expect(constant<!std::is_empty_v<decltype(t6)>>);
     };
+
+    "CTAD"_test = [] {
+        const auto t = compressed_tuple{ 1 };
+        expect(std::is_same_v<decltype(t), compressed_tuple<int>>);
+    };
 };
 
 } // namespace pigro::tests
