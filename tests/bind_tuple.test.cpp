@@ -55,7 +55,7 @@ suite bind_tuple_tests = [] {
     };
 
     "zero_args"_test = [] {
-        auto f = compressed_tuple{} >> []() { return 0; };
+        auto f = compressed_tuple{} >> [] { return 0; };
 
         expect(f() == 0_i);
     };
