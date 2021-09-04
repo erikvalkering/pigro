@@ -16,18 +16,6 @@ struct Empty {
 
 suite uncapture_tests = [] {
     auto empty = Empty{};
-
-    "sfinae_friendly"_test = [=] {
-        auto f = overload{
-            uncaptured(empty) >> [](std::nullptr_t, Empty) { return 0; },
-            [](int) { return 1; },
-        };
-
-        expect(f(nullptr) == 0_i);
-        expect(f(0) == 1_i);
-        expect(constant<std::is_empty_v<decltype(f)>>);
-    };
-
 };
 
 } // namespace pigro::tests

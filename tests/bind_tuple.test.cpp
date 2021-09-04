@@ -67,6 +67,17 @@ suite bind_tuple_tests = [] {
         expect(constant<std::is_empty_v<decltype(f)>>);
     };
 
+    "sfinae_friendly"_test = [=] {
+        auto f = overload{
+            compressed_tuple{ empty } >> [](Empty, std::nullptr_t) { return 0; },
+            [](double) { return 1; },
+        };
+
+        expect(f(nullptr) == 0_i);
+        expect(f(0.0) == 1_i);
+        expect(constant<std::is_empty_v<decltype(f)>>);
+    };
+
     "zero_args"_test = [] {
         auto f = compressed_tuple{} >> [] { return 0; };
 
