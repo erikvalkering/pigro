@@ -28,23 +28,6 @@ suite uncapture_tests = [] {
         expect(constant<std::is_empty_v<decltype(f)>>);
     };
 
-    "variadic"_test = [=] {
-        auto f1 = uncaptured(empty) >> (uncaptured(empty) >> (uncaptured(empty) >> [](auto...) { return 0; }));
-        expect(f1(0) == 0_i);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
-
-        auto f2 = uncaptured(1) >> (uncaptured(10) >> (uncaptured(100) >> [](int a, int b, int c) { return c - b - a; }));
-        expect(f2() == 100 - 10 - 1);
-        expect(constant<!std::is_empty_v<decltype(f2)>>);
-
-        auto f3 = uncaptured(empty, empty, empty) >> [](auto...) { return 0; };
-        expect(f3(0) == 0_i);
-        expect(constant<std::is_empty_v<decltype(f3)>>);
-
-        auto f4 = uncaptured(1, 10, 100) >> [](int a, int b, int c) { return c - b - a; };
-        expect(f4() == 100 - 10 - 1);
-        expect(constant<!std::is_empty_v<decltype(f4)>>);
-    };
 };
 
 } // namespace pigro::tests
