@@ -19,7 +19,7 @@ struct Empty {
 suite bind_tuple_tests = [] {
     auto empty = Empty{};
 
-    "basic"_test = [=] {
+    "stateless"_test = [=] {
         expect(constant<std::is_empty_v<decltype(empty)>>);
 
         auto f1 = [] { return 0; };
