@@ -45,29 +45,6 @@ suite uncapture_tests = [] {
         expect(f4() == 100 - 10 - 1);
         expect(constant<!std::is_empty_v<decltype(f4)>>);
     };
-
-
-
-    "size"_test = [=] {
-        auto x = 1;
-
-        auto f1 = uncaptured(empty) >> [](Empty) { return 0; };
-        expect(f1() == 0_i);
-        expect(constant<sizeof(f1) == 1_i>);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
-
-        auto f2 = uncaptured(empty) >> [x](Empty) { return x; };
-        expect(f2() == 1_i);
-        expect(constant<sizeof(f2) == sizeof(int)>);
-
-        auto f3 = uncaptured(x) >> [](int x) { return x; };
-        expect(f3() == 1_i);
-        expect(constant<sizeof(f3) == sizeof(int)>);
-
-        auto f4 = uncaptured(x) >> [y = x](int x) { return x + y; };
-        expect(f4() == 2_i);
-        expect(constant<sizeof(f4) == sizeof(int) + sizeof(int)>);
-    };
 };
 
 } // namespace pigro::tests

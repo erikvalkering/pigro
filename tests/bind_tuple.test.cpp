@@ -81,6 +81,27 @@ suite bind_tuple_tests = [] {
         expect(f() == 1_i);
         expect(f() == 2_i);
     };
+
+    "size"_test = [=] {
+        auto x = 1;
+
+        auto f1 = compressed_tuple{ empty } >> [](Empty) { return 0; };
+        expect(f1() == 0_i);
+        expect(constant<sizeof(f1) == 1_i>);
+        expect(constant<std::is_empty_v<decltype(f1)>>);
+
+        auto f2 = compressed_tuple{ empty } >> [x](Empty) { return x; };
+        expect(f2() == 1_i);
+        expect(constant<sizeof(f2) == sizeof(int)>);
+
+        auto f3 = compressed_tuple{ x } >> [](int x) { return x; };
+        expect(f3() == 1_i);
+        expect(constant<sizeof(f3) == sizeof(int)>);
+
+        auto f4 = compressed_tuple{ x } >> [y = x](int x) { return x + y; };
+        expect(f4() == 2_i);
+        expect(constant<sizeof(f4) == sizeof(int) + sizeof(int)>);
+    };
 };
 
 } // namespace pigro::tests
