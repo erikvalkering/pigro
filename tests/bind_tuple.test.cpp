@@ -34,6 +34,10 @@ suite bind_tuple_tests = [] {
         expect(f3() == empty);
         expect(constant<std::is_empty_v<decltype(f3)>>);
 
+        auto f4 = compressed_tuple{ empty, empty } >> [](auto empty, auto) { return empty; };
+        expect(f4() == empty);
+        expect(constant<std::is_empty_v<decltype(f4)>>);
+
         // TODO: test whether no copies are being made
         // TODO: test non-default-constructible types
     };
