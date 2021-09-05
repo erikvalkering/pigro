@@ -70,6 +70,12 @@ suite recursive_tests = [] {
         expect(f(foo{}) == 0_i);
         expect(f(bar{}) == 1_i);
     };
+
+    "default_construction"_test = [] {
+        recursive{};
+        recursive{ overload{} };
+        overload{ recursive{} };
+    };
 };
 
 } // namespace pigro::tests
