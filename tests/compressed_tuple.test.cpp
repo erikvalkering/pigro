@@ -75,6 +75,12 @@ suite compressed_tuple_tests = [] {
         expect(type<>(t4) == type<compressed_tuple<const int &>>);
     };
 
+    "default_construction"_test = [] {
+        compressed_tuple<>{};
+        compressed_tuple<int>{};
+        compressed_tuple<int, bool>{};
+    };
+
     "tuple_interface"_test = [] {
         expect(concepts::tuple_like<compressed_tuple<>>);
         expect(concepts::tuple_like<compressed_tuple<int>>);
