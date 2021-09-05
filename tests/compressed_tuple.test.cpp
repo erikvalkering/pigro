@@ -60,8 +60,19 @@ suite compressed_tuple_tests = [] {
     };
 
     "CTAD"_test = [] {
-        const auto t = compressed_tuple{ 1 };
-        expect(std::is_same_v<decltype(t), compressed_tuple<int>>);
+        const auto t1 = compressed_tuple{};
+        expect(std::is_same_v<decltype(t1), compressed_tuple<>>);
+
+        const auto t2 = compressed_tuple{ 1 };
+        expect(std::is_same_v<decltype(t2), compressed_tuple<int>>);
+
+        auto x = 0;
+        const auto t3 = compressed_tuple{ x };
+        expect(std::is_same_v<decltype(t3), compressed_tuple<int &>>);
+
+        const auto y = 0;
+        const auto t4 = compressed_tuple{ y };
+        expect(std::is_same_v<decltype(t4), compressed_tuple<const int &>>);
     };
 };
 
