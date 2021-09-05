@@ -1,5 +1,5 @@
-#include "../src/pigro/recursive.h"
 #include "../src/pigro/overload.h"
+#include "../src/pigro/recursive.h"
 
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
