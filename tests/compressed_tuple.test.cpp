@@ -74,6 +74,14 @@ suite compressed_tuple_tests = [] {
         const auto t4 = compressed_tuple{ y };
         expect(type<>(t4) == type<compressed_tuple<const int &>>);
     };
+
+    "tuple_interface"_test = [] {
+        expect(concepts::tuple_like<compressed_tuple<>>);
+        expect(concepts::tuple_like<compressed_tuple<int>>);
+        expect(concepts::tuple_like<compressed_tuple<const int>>);
+        expect(concepts::tuple_like<compressed_tuple<int &>>);
+        expect(concepts::tuple_like<compressed_tuple<const int &>>);
+    };
 };
 
 } // namespace pigro::tests
