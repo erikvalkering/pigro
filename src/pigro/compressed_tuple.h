@@ -60,8 +60,13 @@ struct compressed_tuple : compressed_tuple_base_t<Ts...> {
     }
 };
 
+compressed_tuple()->compressed_tuple<>;
+
 template<typename... Ts>
-compressed_tuple(Ts &&...) -> compressed_tuple<Ts &&...>;
+compressed_tuple(Ts &&...) -> compressed_tuple<Ts...>;
+
+template<typename... Ts>
+compressed_tuple(Ts &...) -> compressed_tuple<Ts &...>;
 
 } // namespace pigro
 
