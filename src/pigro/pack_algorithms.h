@@ -25,8 +25,8 @@ auto enumerate_pack(auto &&f, auto &&...pack) {
 }
 
 template<size_t n>
-auto enumerate_n(auto f) {
-    return [=]<size_t... idx>(std::index_sequence<idx...>) {
+auto enumerate_n(auto &&f) {
+    return [&]<size_t... idx>(std::index_sequence<idx...>) {
         return enumerate_pack(f, idx...);
     }
     (std::make_index_sequence<n>{});
