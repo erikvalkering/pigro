@@ -98,6 +98,20 @@ suite pack_algorithms_tests = [] {
           })
           == 10);
     };
+
+    "value_categories"_test = [] {
+        const auto tester = [](bool is_lvalue_reference_expected, auto &&value) {
+            enumerate_pack([=](auto &&item) {
+                expect((std::is_lvalue_reference_v<decltype(item)> == is_lvalue_reference_expected));
+            },
+              std::forward<decltype(value)>(value));
+        };
+
+        tester(false, 0);
+
+        auto x = 0;
+        tester(true, x);
+    };
 };
 
 } // namespace pigro::tests
