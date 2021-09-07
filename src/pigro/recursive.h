@@ -39,6 +39,8 @@ struct recursive_impl {
 
 template<typename F>
 struct recursive : private recursive_impl<F> {
+    recursive() = default;
+
     static_assert(!std::is_const_v<F>);
     static_assert(!std::is_reference_v<F>);
     explicit recursive(F f) : recursive_impl<F>{ f } {}
