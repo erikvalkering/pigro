@@ -75,9 +75,11 @@ suite recursive_tests = [] {
         expect(f(bar{}) == 1_i);
     };
 
-    "default_construction"_test = [] {
+    "empty_recursive_overload"_test = [] {
         recursive{ overload{} };
+    };
 
+    "default_construction"_test = [] {
         const auto f = recursive{
             overload{
               [](auto, int) {},
