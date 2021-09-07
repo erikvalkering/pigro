@@ -76,9 +76,7 @@ suite recursive_tests = [] {
     };
 
     "default_construction"_test = [] {
-        recursive{};
         recursive{ overload{} };
-        overload{ recursive{} };
 
         const auto f = recursive{
             overload{
