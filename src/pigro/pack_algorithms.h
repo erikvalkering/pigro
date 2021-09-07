@@ -5,14 +5,21 @@
 namespace pigro {
 
 template<size_t idx, typename T>
-struct Enumerator {
+struct Item {
+    explicit Item(T value) : value{ std::forward<T>(value) } {}
+
     T value;
     constexpr static auto index = idx;
 };
 
-auto enumerate_pack(auto f, auto... pack) {
-    return [ =, t = std::make_tuple(pack...) ]<size_t... idx>(std::index_sequence<idx...>) {
-        return f(Enumerator<idx, decltype(get<idx>(t))>{ std::get<idx>(t) }...);
+auto enumerate_pack(auto &&f, auto &&...pack) {
+    return [&, t = std::tuple<decltype(pack)...>{ std::forward<decltype(pack)>(pack)... } ]<size_t... idx>(std::index_sequence<idx...>) mutable {
+        return f(
+          Item<
+            idx,
+            std::tuple_element_t<idx, decltype(t)>>(
+            std::forward<
+              std::tuple_element_t<idx, decltype(t)>>(std::get<idx>(t)))...);
     }
     (std::make_index_sequence<sizeof...(pack)>{});
 }
