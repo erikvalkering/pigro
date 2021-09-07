@@ -43,14 +43,18 @@ suite recursive_tests = [] {
         expect(f(0.0) == "double"s);
         expect(f(true) == "auto"s);
         expect(f("a"s) == "int"s);
+    };
 
+    "state"_test = [] {
         const auto g = [] { return 0; };
         const auto h = recursive{ overload{
           [=](auto self) { return g(); },
         } };
 
         expect(h() == 0_i);
+    };
 
+    "mutable"_test = [] {
         auto k = recursive{ overload{
           [](auto self) mutable { return 0; },
         } };
