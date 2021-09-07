@@ -75,6 +75,15 @@ suite recursive_tests = [] {
         recursive{};
         recursive{ overload{} };
         overload{ recursive{} };
+
+        const auto f = recursive{
+            overload{
+              [](auto, int) {},
+              [](auto, bool) {},
+            }
+        };
+
+        const auto g = decltype(f){};
     };
 };
 
