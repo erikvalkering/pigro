@@ -21,12 +21,14 @@ struct recursive_impl<F> : F {
     using F::operator();
 
     template<typename... Args>
-    constexpr decltype(auto) operator_call(Args &&...args) {
+    constexpr auto operator_call(Args &&...args)
+      -> decltype((*this)(std::forward<Args>(args)...)) {
         return (*this)(std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    constexpr decltype(auto) operator_call(Args &&...args) const {
+    constexpr auto operator_call(Args &&...args) const
+      -> decltype((*this)(std::forward<Args>(args)...)) {
         return (*this)(std::forward<Args>(args)...);
     }
 };
@@ -48,12 +50,14 @@ struct recursive : private recursive_impl<F> {
     using recursive_impl<F>::operator_call;
 
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) {
+    constexpr auto operator()(Args &&...args)
+      -> decltype(operator_call(*this, std::forward<Args>(args)...)) {
         return operator_call(*this, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) const {
+    constexpr auto operator()(Args &&...args) const
+      -> decltype(operator_call(*this, std::forward<Args>(args)...)) {
         return operator_call(*this, std::forward<Args>(args)...);
     }
 };
