@@ -102,7 +102,7 @@ suite pack_algorithms_tests = [] {
     "value_categories"_test = [] {
         const auto tester = [](bool is_lvalue_reference_expected, auto &&value) {
             enumerate_pack([=](auto &&item) {
-                expect((std::is_lvalue_reference_v<decltype(item)> == is_lvalue_reference_expected));
+                expect((std::is_lvalue_reference_v<decltype(item.value)> == is_lvalue_reference_expected));
             },
               std::forward<decltype(value)>(value));
         };
