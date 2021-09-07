@@ -57,7 +57,7 @@ suite pack_algorithms_tests = [] {
         // As a result, the tuple's elements would be
         // enumerated, instead of the tuple as a whole.
         // In order to enumerate a tuple, you should use
-        // enumerate_tuple().
+        // std::apply.
         //
         // This test ensures that when we enumerate over a single
         // tuple, we get back the tuple.
@@ -67,22 +67,6 @@ suite pack_algorithms_tests = [] {
           },
             tuple{ 1, 2, 3, 4, 5 })
           == tuple{ 1, 2, 3, 4, 5 });
-    };
-
-    "enumerate_tuple"_test = [] {
-        expect(
-          enumerate_tuple([](auto... items) {
-              return (items.index + ...);
-          },
-            tuple{ 1, 2, 3, 4, 5 })
-          == 10_i);
-
-        expect(
-          enumerate_tuple([](auto... items) {
-              return (items.value + ...);
-          },
-            tuple{ 1, 2, 3, 4, 5 })
-          == 15_i);
     };
 
     "enumerate_n"_test = [] {
