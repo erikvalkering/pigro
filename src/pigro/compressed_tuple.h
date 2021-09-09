@@ -14,6 +14,7 @@
 namespace pigro {
 
 template<size_t tag, concepts::empty T>
+requires std::is_rvalue_reference_v<T>
 auto compressed_tuple_element(T value) {
     return [](const auto &self, idx_t<tag>) {
         return empty_object<T>::get();
