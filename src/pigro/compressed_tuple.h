@@ -28,16 +28,15 @@ auto compressed_tuple_element(T value) {
 template<size_t tag, typename T>
 auto compressed_tuple_element(T &&value) {
     return overload{
-        [](const auto &self, idx_t<tag>) -> const auto &{
-                                           using Self = std::remove_cvref_t<decltype(self)>;
-    return std::as_const(const_cast<Self &>(self)(idx<tag>));
-}
-,
-  [capture = std::tuple{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> auto & {
-    return std::get<0>(capture);
-}
-,
-}; // namespace pigro
+        [](const auto &self, idx_t<tag>) -> const T & {
+            return const_cast<std::remove_cvref_t<decltype(self)> &>(self)(idx<tag>);
+        },
+        // TODO: capture is int, but should be int &
+        // TODO: if moved into the tuple, then should be int
+        [capture = std::tuple{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> T & {
+            return std::get<0>(capture);
+        },
+    };
 }
 
 auto make_compressed_tuple_base(auto &&...values) {
