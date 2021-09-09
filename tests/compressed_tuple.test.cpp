@@ -59,7 +59,7 @@ suite compressed_tuple_tests = [] {
         expect(constant<!std::is_empty_v<decltype(t6)>>);
     };
 
-    "compressed_tuple_element"_test = [] {
+    "compressed_tuple_element_stateful"_test = [] {
         auto e1 = compressed_tuple_element<0>(0);
         expect(type<decltype(e1(e1, idx<0>))> == type<int &>);
 
