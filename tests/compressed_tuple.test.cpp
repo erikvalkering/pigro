@@ -77,11 +77,37 @@ suite compressed_tuple_tests = [] {
         const auto e5 = compressed_tuple_element<0>(0);
         expect(type<decltype(e5(e5, idx<0>))> == type<const int &>);
 
-        auto e6 = compressed_tuple_element<0>(idx<0>);
-        expect(type<decltype(e6(e6, idx<0>))> == type<idx_t<0>>);
 
-        const auto e7 = compressed_tuple_element<0>(idx<0>);
-        expect(type<decltype(e7(e7, idx<0>))> == type<idx_t<0>>);
+    };
+
+    "compressed_tuple_element_stateless"_test = [] {
+        auto e1 = compressed_tuple_element<0>(idx<0>);
+        expect(e1(e1, idx<0>) == 0);
+        expect(type<decltype(e1(e1, idx<0>))> == type<idx_t<0>>);
+
+        const auto e2 = compressed_tuple_element<0>(idx<0>);
+        expect(e2(e2, idx<0>) == 0);
+        expect(type<decltype(e2(e2, idx<0>))> == type<idx_t<0>>);
+
+        auto x1 = idx<0>;
+        auto e3 = compressed_tuple_element<0>(x1);
+        expect(e3(e3, idx<0>) == x1);
+        expect(type<decltype(e3(e3, idx<0>))> == type<idx_t<0> &>);
+
+        const auto x2 = idx<0>;
+        auto e4 = compressed_tuple_element<0>(x2);
+        expect(e4(e4, idx<0>) == x2);
+        expect(type<decltype(e4(e4, idx<0>))> == type<const idx_t<0> &>);
+
+        auto x3 = idx<0>;
+        const auto e5 = compressed_tuple_element<0>(x3);
+        expect(e5(e5, idx<0>) == x3);
+        expect(type<decltype(e5(e5, idx<0>))> == type<const idx_t<0> &>);
+
+        const auto x4 = idx<0>;
+        const auto e6 = compressed_tuple_element<0>(x4);
+        expect(e6(e6, idx<0>) == x4);
+        expect(type<decltype(e6(e6, idx<0>))> == type<const idx_t<0> &>);
     };
 
     "CTAD"_test = [] {
