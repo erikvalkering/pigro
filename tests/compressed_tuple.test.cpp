@@ -59,6 +59,25 @@ suite compressed_tuple_tests = [] {
         expect(constant<!std::is_empty_v<decltype(t6)>>);
     };
 
+    "compressed_tuple_element"_test = [] {
+        auto e1 = compressed_tuple_element<0>(0);
+        expect(type<decltype(e1(e1, idx<0>))> == type<int &>);
+
+        const auto e2 = compressed_tuple_element<0>(0);
+        expect(type<decltype(e2(e2, idx<0>))> == type<const int &>);
+
+        auto x = 0;
+        auto e3 = compressed_tuple_element<0>(x);
+        expect(type<decltype(e3(e3, idx<0>))> == type<int &>);
+
+        const auto y = 0;
+        auto e4 = compressed_tuple_element<0>(y);
+        expect(type<decltype(e4(e4, idx<0>))> == type<const int &>);
+
+        const auto e5 = compressed_tuple_element<0>(0);
+        expect(type<decltype(e5(e5, idx<0>))> == type<const int &>);
+    };
+
     "CTAD"_test = [] {
         const auto t1 = compressed_tuple{};
         expect(type<>(t1) == type<compressed_tuple<>>);
