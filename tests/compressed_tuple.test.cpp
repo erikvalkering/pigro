@@ -78,6 +78,10 @@ suite compressed_tuple_tests = [] {
         const auto e5 = compressed_tuple_element<0>(x3);
         expect(type<decltype(e5(e5, idx<0>))> == type<const int &>);
 
+        const auto x4 = 0;
+        const auto e6 = compressed_tuple_element<0>(x4);
+        expect(e6(e6, idx<0>) == x4);
+        expect(type<decltype(e6(e6, idx<0>))> == type<const int &>);
 
     };
 
