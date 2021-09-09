@@ -13,4 +13,9 @@ using idx_t = std::integral_constant<size_t, index>;
 template<size_t index>
 constexpr auto idx = idx_t<index>{};
 
+template<typename T>
+constexpr std::remove_cv_t<T> &as_nonconst(T &value) noexcept {
+    return const_cast<std::remove_cv_t<T> &>(value);
+}
+
 } // namespace pigro
