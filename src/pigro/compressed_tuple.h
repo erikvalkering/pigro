@@ -23,13 +23,15 @@ auto compressed_tuple_element(T value) {
 
 template<size_t tag, typename T>
 auto compressed_tuple_element(T &&value) {
+    using capture_t = std::conditional_t<std::is_lvalue_reference_v<T>, T, std::remove_reference_t<T>>;
+
     return overload{
         [](const auto &self, idx_t<tag>) -> const T & {
             return const_cast<std::remove_cvref_t<decltype(self)> &>(self)(idx<tag>);
         },
         // TODO: capture is int, but should be int &
         // TODO: if moved into the tuple, then should be int
-        [capture = std::tuple{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> T & {
+        [capture = std::tuple<capture_t>{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> T & {
             return std::get<0>(capture);
         },
     };
