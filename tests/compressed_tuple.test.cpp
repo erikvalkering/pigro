@@ -76,6 +76,12 @@ suite compressed_tuple_tests = [] {
 
         const auto e5 = compressed_tuple_element<0>(0);
         expect(type<decltype(e5(e5, idx<0>))> == type<const int &>);
+
+        auto e6 = compressed_tuple_element<0>(idx<0>);
+        expect(type<decltype(e6(e6, idx<0>))> == type<idx_t<0>>);
+
+        const auto e7 = compressed_tuple_element<0>(idx<0>);
+        expect(type<decltype(e7(e7, idx<0>))> == type<idx_t<0>>);
     };
 
     "CTAD"_test = [] {
