@@ -15,13 +15,8 @@ namespace pigro {
 
 template<size_t tag, concepts::empty T>
 auto compressed_tuple_element(T value) {
-    return overload{
-        [](const auto &self, idx_t<tag>) {
-            return empty_object<T>::get();
-        },
-        [](auto &self, idx_t<tag>) mutable {
-            return empty_object<T>::get();
-        },
+    return [](const auto &self, idx_t<tag>) {
+        return empty_object<T>::get();
     };
 }
 
