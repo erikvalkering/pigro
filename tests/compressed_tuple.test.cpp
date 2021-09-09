@@ -61,21 +61,26 @@ suite compressed_tuple_tests = [] {
 
     "compressed_tuple_element_stateful"_test = [] {
         auto e1 = compressed_tuple_element<0>(0);
+        expect(e1(e1, idx<0>) == 0);
         expect(type<decltype(e1(e1, idx<0>))> == type<int &>);
 
         const auto e2 = compressed_tuple_element<0>(0);
+        expect(e2(e2, idx<0>) == 0);
         expect(type<decltype(e2(e2, idx<0>))> == type<const int &>);
 
         auto x1 = 0;
         auto e3 = compressed_tuple_element<0>(x1);
+        expect(e3(e3, idx<0>) == x1);
         expect(type<decltype(e3(e3, idx<0>))> == type<int &>);
 
         const auto x2 = 0;
         auto e4 = compressed_tuple_element<0>(x2);
+        expect(e4(e4, idx<0>) == x2);
         expect(type<decltype(e4(e4, idx<0>))> == type<const int &>);
 
         auto x3 = 0;
         const auto e5 = compressed_tuple_element<0>(x3);
+        expect(e5(e5, idx<0>) == x3);
         expect(type<decltype(e5(e5, idx<0>))> == type<const int &>);
 
         const auto x4 = 0;
