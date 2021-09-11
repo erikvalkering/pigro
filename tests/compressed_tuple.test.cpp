@@ -140,6 +140,13 @@ suite compressed_tuple_tests = [] {
         compressed_tuple<>{};
         compressed_tuple<int>{};
         compressed_tuple<int, bool>{};
+
+        expect(std::default_initializable<compressed_tuple<>>);
+        expect(std::default_initializable<compressed_tuple<int>>);
+        expect(std::default_initializable<compressed_tuple<int, bool>>);
+
+        expect(!std::default_initializable<compressed_tuple<int &, bool>>);
+        expect(!std::default_initializable<compressed_tuple<int &&, bool>>);
     };
 
     "tuple_interface"_test = [] {
