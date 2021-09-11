@@ -136,6 +136,7 @@ suite compressed_tuple_tests = [] {
     };
 
     "default_construction"_test = [] {
+        compressed_tuple{};
         compressed_tuple<>{};
         compressed_tuple<int>{};
         compressed_tuple<int, bool>{};
