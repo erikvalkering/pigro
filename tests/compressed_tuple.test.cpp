@@ -119,6 +119,20 @@ suite compressed_tuple_tests = [] {
         expect(type<decltype(e6(e6, idx<0>))> == type<const idx_t<0> &>);
     };
 
+    "SFINAE_friendliness"_test = [] {
+        auto f = recursive(overload{
+          compressed_tuple_element<0>(0),
+          [](auto...) { return 1; },
+        });
+
+        expect(f(idx_t<0>{}) == 0_i);
+        expect(f(0) == 1_i);
+
+        const auto g = f;
+        expect(g(idx_t<0>{}) == 0_i);
+        expect(g(0) == 1_i);
+    };
+
     "lvalue_reference"_test = [] {
         auto x = 0;
         auto t = compressed_tuple{ x };
