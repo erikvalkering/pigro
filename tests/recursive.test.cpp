@@ -79,11 +79,6 @@ suite recursive_tests = [] {
         recursive{ overload{} };
     };
 
-    "default_construction_stateful"_test = [] {
-        const auto f = recursive{ [x = 0](auto) {} };
-        const auto g = decltype(f){};
-    };
-
     "default_construction_stateless"_test = [] {
         const auto f = recursive{ [] {} };
         const auto g = decltype(f){};
