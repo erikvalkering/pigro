@@ -51,6 +51,9 @@ using compressed_tuple_base_t = decltype(make_compressed_tuple_base(std::declval
 
 template<typename... Ts>
 struct compressed_tuple : compressed_tuple_base_t<Ts...> {
+    compressed_tuple() requires(std::default_initializable<Ts> &&...)
+      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(Ts{}...) } {}
+
     explicit compressed_tuple(Ts &&...values)
       : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(std::forward<decltype(values)>(values)...) } {
     }
