@@ -119,6 +119,19 @@ suite compressed_tuple_tests = [] {
         expect(type<decltype(e6(e6, idx<0>))> == type<const idx_t<0> &>);
     };
 
+    "lvalue_reference"_test = [] {
+        auto x = 0;
+        auto t = compressed_tuple{ x };
+        ++x;
+
+        expect(std::get<0>(t) == x);
+    };
+
+    "rvalue_reference"_test = [] {
+        auto t = compressed_tuple{ 0 };
+        expect(std::get<0>(t) == 0);
+    };
+
     "CTAD"_test = [] {
         const auto t1 = compressed_tuple{};
         expect(type<>(t1) == type<compressed_tuple<>>);
