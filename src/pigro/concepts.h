@@ -21,7 +21,7 @@ template<typename F>
 concept lazy_function_unwrapped = lazy_function<F> && ::std::invocable<F>;
 
 template<typename T>
-concept empty = std::is_empty_v<T>;
+concept empty = std::is_empty_v<std::remove_cvref_t<T>>;
 
 template<std::size_t I, class T>
 concept has_tuple_element =
