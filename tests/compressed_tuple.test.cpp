@@ -76,7 +76,7 @@ suite compressed_tuple_tests = [] {
         const auto x2 = 0;
         auto e4 = recursive{ compressed_tuple_element<0>(x2) };
         expect(e4(idx<0>) == x2);
-        expect(type<decltype(e4(idx<0>))> == type<const int &>);
+        expect(type<decltype(e4(idx<0>))> == type<int &>);
 
         auto x3 = 0;
         const auto e5 = recursive{ compressed_tuple_element<0>(x3) };
@@ -101,22 +101,22 @@ suite compressed_tuple_tests = [] {
         auto x1 = idx<0>;
         auto e3 = recursive{ compressed_tuple_element<0>(x1) };
         expect(e3(idx<0>) == x1);
-        expect(type<decltype(e3(idx<0>))> == type<idx_t<0> &>);
+        expect(type<decltype(e3(idx<0>))> == type<idx_t<0>>);
 
         const auto x2 = idx<0>;
         auto e4 = recursive{ compressed_tuple_element<0>(x2) };
         expect(e4(idx<0>) == x2);
-        expect(type<decltype(e4(idx<0>))> == type<const idx_t<0> &>);
+        expect(type<decltype(e4(idx<0>))> == type<idx_t<0>>);
 
         auto x3 = idx<0>;
         const auto e5 = recursive{ compressed_tuple_element<0>(x3) };
         expect(e5(idx<0>) == x3);
-        expect(type<decltype(e5(idx<0>))> == type<const idx_t<0> &>);
+        expect(type<decltype(e5(idx<0>))> == type<idx_t<0>>);
 
         const auto x4 = idx<0>;
         const auto e6 = recursive{ compressed_tuple_element<0>(x4) };
         expect(e6(idx<0>) == x4);
-        expect(type<decltype(e6(idx<0>))> == type<const idx_t<0> &>);
+        expect(type<decltype(e6(idx<0>))> == type<idx_t<0>>);
     };
 
     "SFINAE_friendliness"_test = [] {
@@ -157,11 +157,11 @@ suite compressed_tuple_tests = [] {
 
         auto x = 0;
         const auto t3 = compressed_tuple{ x };
-        expect(type<>(t3) == type<compressed_tuple<int &>>);
+        expect(type<>(t3) == type<compressed_tuple<int>>);
 
         const auto y = 0;
         const auto t4 = compressed_tuple{ y };
-        expect(type<>(t4) == type<compressed_tuple<const int &>>);
+        expect(type<>(t4) == type<compressed_tuple<int>>);
     };
 
     "default_construction"_test = [] {

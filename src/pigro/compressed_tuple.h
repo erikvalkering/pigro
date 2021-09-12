@@ -14,53 +14,47 @@
 namespace pigro {
 
 template<size_t tag, concepts::empty T>
-requires std::is_rvalue_reference_v<T &&>
-auto compressed_tuple_element(T &&value) {
+auto compressed_tuple_element(T) {
     return [](const auto &self, idx_t<tag>) {
-        return empty_object<std::remove_cvref_t<T>>::get();
+        return empty_object<T>::get();
     };
 }
-
-template<typename T>
-using capture_t = std::conditional_t<std::is_lvalue_reference_v<T>, T, std::remove_reference_t<T>>;
 
 template<size_t tag, typename T>
-auto compressed_tuple_element(T &&value) {
+auto compressed_tuple_element(T value) {
     return overload{
-        [](const auto &self, idx_t<tag>) -> decltype(std::as_const(as_nonconst(self)(idx<tag>))) {
+        [](const auto &self, idx_t<tag>) -> const T & {
             return std::as_const(as_nonconst(self)(idx<tag>));
         },
-        [capture = std::tuple<capture_t<T>>{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> decltype(std::get<0>(std::declval<decltype(std::tuple<capture_t<T>>{ std::forward<T>(value) }) &>())) {
-            return std::get<0>(capture);
+        [=](auto &self, idx_t<tag>) mutable -> T & {
+            return value;
         },
     };
-}
-
-auto make_compressed_tuple_base(auto &&...values) {
-    return enumerate_pack(
-      [](auto &&...items) {
-          return recursive{
-              overload{ compressed_tuple_element<items.index>(std::forward<decltype(items.value)>(items.value))... }
-          };
-      },
-      std::forward<decltype(values)>(values)...);
 }
 
 template<typename... Ts>
-using compressed_tuple_base_t = decltype(make_compressed_tuple_base(std::declval<Ts>()...));
+auto make_compressed_tuple_base(const Ts &...values) {
+    return enumerate_pack(
+      [](auto &&...items) {
+          return recursive{
+              overload{ compressed_tuple_element<items.index, decltype(items.value)>(std::forward<decltype(items.value)>(items.value))... }
+          };
+      },
+      values...);
+}
+
+template<typename... Ts>
+using compressed_tuple_base_t = decltype(make_compressed_tuple_base<Ts...>(std::declval<const Ts &>()...));
 
 template<typename... Ts>
 struct compressed_tuple : compressed_tuple_base_t<Ts...> {
     compressed_tuple() requires(std::default_initializable<Ts> &&...)
-      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(Ts{}...) } {}
+      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base<Ts...>(Ts{}...) } {}
 
-    explicit compressed_tuple(Ts &&...values)
-      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base(std::forward<decltype(values)>(values)...) } {
+    explicit compressed_tuple(const Ts &...values)
+      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base<Ts...>(values...) } {
     }
 };
-
-template<typename... Ts>
-compressed_tuple(Ts &&...) -> compressed_tuple<capture_t<Ts>...>;
 
 } // namespace pigro
 
