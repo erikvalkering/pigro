@@ -85,13 +85,7 @@ suite recursive_tests = [] {
     };
 
     "default_construction_stateless"_test = [] {
-        const auto f = recursive{
-            overload{
-              [](auto, int) {},
-              [](auto, bool) {},
-            }
-        };
-
+        const auto f = recursive{ [] {} };
         const auto g = decltype(f){};
     };
 };
