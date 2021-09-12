@@ -127,11 +127,11 @@ suite compressed_tuple_tests = [] {
             }
         };
 
-        expect(f(idx_t<0>{}) == 0_i);
+        expect(f(idx<0>) == 0_i);
         expect(f(0) == 1_i);
 
         const auto g = f;
-        expect(g(idx_t<0>{}) == 0_i);
+        expect(g(idx<0>) == 0_i);
         expect(g(0) == 1_i);
     };
 
