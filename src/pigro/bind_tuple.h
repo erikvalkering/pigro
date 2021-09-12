@@ -15,7 +15,7 @@ auto bind_front_tuple(auto f, concepts::tuple_like auto t) {
               auto &&f = self(idx<0>);
               auto &&compressed_args = self(idx<1>);
 
-              return enumerate_n<std::tuple_size_v<decltype(compressed_args)>>(
+              return enumerate_n<std::tuple_size_v<std::remove_cvref_t<decltype(compressed_args)>>>(
                 [&](auto... items) {
                     return f(std::get<items.index>(compressed_args)..., std::forward<decltype(args)>(args)...);
                 });
