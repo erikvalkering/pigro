@@ -27,8 +27,8 @@ using capture_t = std::conditional_t<std::is_lvalue_reference_v<T>, T, std::remo
 template<size_t tag, typename T>
 auto compressed_tuple_element(T &&value) {
     return overload{
-        [](const auto &self, idx_t<tag>) -> decltype(std::as_const(as_nonconst(self)(as_nonconst(self), idx<tag>))) {
-            return std::as_const(as_nonconst(self)(as_nonconst(self), idx<tag>));
+        [](const auto &self, idx_t<tag>) -> decltype(std::as_const(as_nonconst(self)(idx<tag>))) {
+            return std::as_const(as_nonconst(self)(idx<tag>));
         },
         [capture = std::tuple<capture_t<T>>{ std::forward<T>(value) }](auto &self, idx_t<tag>) mutable -> decltype(std::get<0>(std::declval<decltype(std::tuple<capture_t<T>>{ std::forward<T>(value) }) &>())) {
             return std::get<0>(capture);
