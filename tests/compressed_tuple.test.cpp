@@ -184,6 +184,8 @@ suite compressed_tuple_tests = [] {
         expect(concepts::tuple_like<compressed_tuple<const int>>);
         expect(concepts::tuple_like<compressed_tuple<int &>>);
         expect(concepts::tuple_like<compressed_tuple<const int &>>);
+        expect(concepts::tuple_like<compressed_tuple<int &&>>);
+        expect(concepts::tuple_like<compressed_tuple<const int &&>>);
     };
 };
 
