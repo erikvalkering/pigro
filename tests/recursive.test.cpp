@@ -63,16 +63,23 @@ suite recursive_tests = [] {
     };
 
     "SFINAE_friendliness"_test = [] {
-        auto f =
-          overload{
-              recursive{
-                [](auto self, foo) { return 0; } },
-              recursive{
-                [](auto self, bar) { return 1; } },
-          };
+        auto f = recursive{
+            overload{
+              []<size_t idx>(auto, idx_t<idx>) -> std::enable_if_t<idx <= 1, size_t> {
+                  return idx;
+              },
+              [](auto...) { return 2; },
+            }
+        };
 
-        expect(f(foo{}) == 0_i);
-        expect(f(bar{}) == 1_i);
+        expect(f(idx_t<0>{}) == 0_i);
+        expect(f(idx_t<1>{}) == 1_i);
+        expect(f(0) == 2_i);
+
+        const auto g = f;
+        expect(g(idx_t<0>{}) == 0_i);
+        expect(g(idx_t<1>{}) == 1_i);
+        expect(g(0) == 2_i);
     };
 
     "empty_recursive_overload"_test = [] {
