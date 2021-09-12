@@ -23,10 +23,10 @@ auto compressed_tuple_element(T) {
 template<size_t tag, typename T>
 auto compressed_tuple_element(T value) {
     return overload{
-        [](const auto &self, idx_t<tag>) -> const T & {
+        [](auto &&self, idx_t<tag>) -> const T & {
             return std::as_const(as_nonconst(self)(idx<tag>));
         },
-        [=](auto &self, idx_t<tag>) mutable -> T & {
+        [=](auto &&self, idx_t<tag>) mutable -> T & {
             return value;
         },
     };
