@@ -120,10 +120,12 @@ suite compressed_tuple_tests = [] {
     };
 
     "SFINAE_friendliness"_test = [] {
-        auto f = recursive(overload{
-          compressed_tuple_element<0>(0),
-          [](auto...) { return 1; },
-        });
+        auto f = recursive{
+            overload{
+              compressed_tuple_element<0>(0),
+              [](auto...) { return 1; },
+            }
+        };
 
         expect(f(idx_t<0>{}) == 0_i);
         expect(f(0) == 1_i);
