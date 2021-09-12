@@ -62,7 +62,7 @@ suite recursive_tests = [] {
         expect(k() == 0_i);
     };
 
-    "sfinae_friendly"_test = [] {
+    "SFINAE_friendliness"_test = [] {
         auto f =
           overload{
               recursive{
