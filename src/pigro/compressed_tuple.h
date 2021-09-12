@@ -15,7 +15,7 @@ namespace pigro {
 
 template<size_t tag, concepts::empty T>
 auto compressed_tuple_element(T) {
-    return [](const auto &self, idx_t<tag>) {
+    return [](auto &&self, idx_t<tag>) {
         return empty_object<std::remove_cvref_t<T>>::get();
     };
 }
