@@ -53,7 +53,7 @@ struct compressed_tuple : compressed_tuple_base_t<Ts...> {
       : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base<Ts...>(Ts{}...) } {}
 
     template<typename... Us>
-    explicit compressed_tuple(Us &&...values)
+    explicit compressed_tuple(Us &&...values) requires(sizeof...(Ts) == sizeof...(Us))
       : compressed_tuple_base_t<Ts...>{
             make_compressed_tuple_base<Ts...>(static_cast<Ts...>(values)...)
         } {}
