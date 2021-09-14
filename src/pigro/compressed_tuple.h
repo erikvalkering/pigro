@@ -36,7 +36,7 @@ auto compressed_tuple_element(T &&value) {
 template<typename... Ts>
 auto make_compressed_tuple_base(Ts &&...values) {
     return enumerate_pack(
-      [](auto &&...items) {
+      [](const auto &...items) {
           return recursive{
               overload{ compressed_tuple_element<items.index>(std::forward<decltype(items.value)>(items.value))... }
           };
