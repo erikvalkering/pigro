@@ -41,11 +41,11 @@ suite bind_tuple_tests = [] {
 
     "stateful"_test = [=] {
         auto f1 = compressed_tuple{ 1 } >> [](auto arg) { return arg; };
-        expect(f1() == 1);
+        expect(f1() == 1_i);
         expect(!std::is_empty_v<decltype(f1)>);
 
         auto f2 = compressed_tuple{ 1, 2, 3, 4 } >> [](auto... args) { return (args + ...); };
-        expect(f2() == 10);
+        expect(f2() == 10_i);
         expect(!std::is_empty_v<decltype(f2)>);
         // TODO: test whether no copies are being made
         // TODO: test non-default-constructible types
