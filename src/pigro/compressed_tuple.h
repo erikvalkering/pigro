@@ -34,14 +34,14 @@ auto compressed_tuple_element(T &&value) {
 }
 
 template<typename... Ts>
-auto make_compressed_tuple_base(const Ts &...values) {
+auto make_compressed_tuple_base(Ts &&...values) {
     return enumerate_pack(
       [](auto &&...items) {
           return recursive{
-              overload{ compressed_tuple_element<items.index, decltype(items.value)>(std::forward<decltype(items.value)>(items.value))... }
+              overload{ compressed_tuple_element<items.index>(std::forward<decltype(items.value)>(items.value))... }
           };
       },
-      values...);
+      std::forward<decltype(values)>(values)...);
 }
 
 template<typename... Ts>
