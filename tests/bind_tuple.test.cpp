@@ -20,33 +20,33 @@ suite bind_tuple_tests = [] {
     auto empty = Empty{};
 
     "stateless"_test = [=] {
-        expect(constant<std::is_empty_v<decltype(empty)>>);
+        expect(std::is_empty_v<decltype(empty)>);
 
         auto f1 = [] { return 0; };
         expect(f1() == 0_i);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
+        expect(std::is_empty_v<decltype(f1)>);
 
         auto f2 = [=] { return empty; };
         expect(f2() == empty);
-        expect(constant<!std::is_empty_v<decltype(f2)>>);
+        expect(!std::is_empty_v<decltype(f2)>);
 
         auto f3 = compressed_tuple{ empty } >> [](auto empty) { return empty; };
         expect(f3() == empty);
-        expect(constant<std::is_empty_v<decltype(f3)>>);
+        expect(std::is_empty_v<decltype(f3)>);
 
         auto f4 = compressed_tuple{ empty, empty } >> [](auto empty, auto) { return empty; };
         expect(f4() == empty);
-        expect(constant<std::is_empty_v<decltype(f4)>>);
+        expect(std::is_empty_v<decltype(f4)>);
     };
 
     "stateful"_test = [=] {
         auto f1 = compressed_tuple{ 1 } >> [](auto arg) { return arg; };
         expect(f1() == 1);
-        expect(constant<!std::is_empty_v<decltype(f1)>>);
+        expect(!std::is_empty_v<decltype(f1)>);
 
         auto f2 = compressed_tuple{ 1, 2, 3, 4 } >> [](auto... args) { return (args + ...); };
         expect(f2() == 10);
-        expect(constant<!std::is_empty_v<decltype(f2)>>);
+        expect(!std::is_empty_v<decltype(f2)>);
         // TODO: test whether no copies are being made
         // TODO: test non-default-constructible types
     };
@@ -54,17 +54,17 @@ suite bind_tuple_tests = [] {
     "extra_parameters"_test = [=] {
         auto f1 = compressed_tuple{ empty } >> [](Empty, int) { return 0; };
         expect(f1(0) == 0_i);
-        expect(constant<std::is_empty_v<decltype(f1)>>);
+        expect(std::is_empty_v<decltype(f1)>);
 
         auto f2 = compressed_tuple{ empty } >> [](Empty, int, int) mutable { return 0; };
         expect(f2(0, 0) == 0_i);
-        expect(constant<std::is_empty_v<decltype(f2)>>);
+        expect(std::is_empty_v<decltype(f2)>);
     };
 
     "mutable"_test = [=] {
         auto f = compressed_tuple{ empty } >> [](Empty) mutable { return 0; };
         expect(f() == 0_i);
-        expect(constant<std::is_empty_v<decltype(f)>>);
+        expect(std::is_empty_v<decltype(f)>);
     };
 
     "sfinae_friendly"_test = [=] {
@@ -75,7 +75,7 @@ suite bind_tuple_tests = [] {
 
         expect(f(nullptr) == 0_i);
         expect(f(0.0) == 1_i);
-        expect(constant<std::is_empty_v<decltype(f)>>);
+        expect(std::is_empty_v<decltype(f)>);
     };
 
     "zero_args"_test = [] {

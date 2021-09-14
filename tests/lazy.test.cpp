@@ -136,8 +136,8 @@ suite lazy_tests = [] {
         auto f = lazy([] {});
         f();
 
-        expect(constant<sizeof(f) == sizeof(bool)>);
-        expect(constant<type<decltype(f())> == type<void>>);
+        expect(sizeof(f) == sizeof(bool));
+        expect(type<decltype(f())> == type<void>);
     };
 
     "comparisons"_test = [] {
@@ -189,44 +189,44 @@ suite lazy_tests = [] {
 
     "memory_footprint"_test = [] {
         auto f1 = lazy([] {});
-        expect(constant<sizeof(f1) == sizeof(bool)>);
+        expect(sizeof(f1) == sizeof(bool));
 
         auto f2 = lazy([] { return 0; });
-        expect(constant<sizeof(f2) == sizeof(std::optional<int>)>);
+        expect(sizeof(f2) == sizeof(std::optional<int>));
 
         auto x1 = 0;
         auto f3 = lazy([=] { return x1; });
-        expect(constant<sizeof(f3) == sizeof(int) + sizeof(std::optional<int>)>);
+        expect(sizeof(f3) == sizeof(int) + sizeof(std::optional<int>));
 
         auto x2 = 0;
         auto f4 = lazy([&] { return x2; });
-        expect(constant<sizeof(f4) == sizeof(int &) + sizeof(std::optional<int>)>);
+        expect(sizeof(f4) == sizeof(int &) + sizeof(std::optional<int>));
 
         auto x3 = 0;
         auto f5 = lazy([](auto x3) { return x3; }, x3);
-        expect(constant<sizeof(f5) == sizeof(std::optional<int>) + sizeof(int)>);
+        expect(sizeof(f5) == sizeof(std::optional<int>) + sizeof(int));
 
         auto x4 = std::integral_constant<int, 0>{};
         auto f6 = lazy([](auto x4) { return x4; }, x4);
-        expect(constant<sizeof(f6) == sizeof(std::optional<int>)>);
+        expect(sizeof(f6) == sizeof(std::optional<int>));
 
         auto g1 = [] { return 0; };
         auto f7 = lazy([](auto g1) { return g1; }, g1);
-        expect(constant<sizeof(f7) == sizeof(std::optional<int>) + sizeof(std::optional<int>)>);
+        expect(sizeof(f7) == sizeof(std::optional<int>) + sizeof(std::optional<int>));
 
         auto x5 = 0;
         auto g2 = [=] { return x5; };
         auto f8 = lazy([](auto g2) { return g2; }, g2);
-        expect(constant<sizeof(f8) == sizeof(std::optional<int>) + sizeof(std::optional<int>) + sizeof(int)>);
+        expect(sizeof(f8) == sizeof(std::optional<int>) + sizeof(std::optional<int>) + sizeof(int));
 
         auto x6 = 0;
         auto g3 = [&] { return x6; };
         auto f9 = lazy([](auto g3) { return g3; }, g3);
-        expect(constant<sizeof(f9) == sizeof(std::optional<int>) + sizeof(std::optional<int>) + sizeof(int &)>);
+        expect(sizeof(f9) == sizeof(std::optional<int>) + sizeof(std::optional<int>) + sizeof(int &));
 
         auto g4 = lazy([] { return 0; });
         auto f10 = lazy([](auto g4) { return g4; }, g4);
-        expect(constant<sizeof(f9) == sizeof(std::optional<int>) + sizeof(std::optional<int>)>);
+        expect(sizeof(f9) == sizeof(std::optional<int>) + sizeof(std::optional<int>));
     };
 };
 

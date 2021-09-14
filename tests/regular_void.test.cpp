@@ -12,7 +12,7 @@ suite regular_void_tests = [] {
         const auto void_a = regular_void{};
         const auto void_b = regular_void{};
 
-        expect(constant<std::regular<regular_void>>);
+        expect(std::regular<regular_void>);
 
         expect(void_a == void_a);
         expect(void_a == void_b);
