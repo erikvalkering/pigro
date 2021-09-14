@@ -2,6 +2,7 @@
 
 #include "concepts.h"
 #include "empty_object.h"
+#include "fwd_capture.h"
 #include "overload.h"
 #include "pack_algorithms.h"
 #include "recursive.h"
@@ -21,13 +22,13 @@ auto compressed_tuple_element(T) {
 }
 
 template<size_t tag, typename T>
-auto compressed_tuple_element(T value) {
+auto compressed_tuple_element(T &&value) {
     return overload{
-        [](auto &&self, idx_t<tag>) -> const T & {
+        [](auto &&self, idx_t<tag>) -> std::add_const_t<std::remove_cvref_t<T>> & {
             return std::as_const(as_nonconst(self)(idx<tag>));
         },
-        [=](auto &&self, idx_t<tag>) mutable -> T & {
-            return value;
+        [value = fwd_capture(std::forward<T>(value))](auto &&self, idx_t<tag>) mutable -> T & {
+            return value.get();
         },
     };
 }
