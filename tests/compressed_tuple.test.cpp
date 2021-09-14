@@ -10,14 +10,7 @@ using namespace boost::ut;
 
 namespace pigro::tests {
 
-struct Empty {
-    Empty() = default;
-    auto operator<=>(const Empty &) const = default;
-};
-
-suite compressed_tuple_tests = [] {
-    auto empty = Empty{};
-
+suite compressed_tuple_element_tests = [] {
     "compressed_tuple_element_stateful"_test = [] {
         auto e1 = recursive{ compressed_tuple_element<0>(0) };
         expect(e1(idx<0>) == 0);
@@ -93,6 +86,15 @@ suite compressed_tuple_tests = [] {
         expect(g(idx<0>) == 0_i);
         expect(g(0) == 1_i);
     };
+};
+
+struct Empty {
+    Empty() = default;
+    auto operator<=>(const Empty &) const = default;
+};
+
+suite compressed_tuple_tests = [] {
+    auto empty = Empty{};
 
     "basic"_test = [=] {
         auto t1 = compressed_tuple{};
