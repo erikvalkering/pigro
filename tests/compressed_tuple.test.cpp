@@ -137,10 +137,14 @@ suite compressed_tuple_tests = [] {
 
     "lvalue_reference"_test = [] {
         auto x = 0;
-        auto t = compressed_tuple{ x };
-        ++x;
+        auto t = compressed_tuple<int &>{ x };
+        expect(std::get<0>(t) == 0);
 
-        expect(std::get<0>(t) == x);
+        ++x;
+        expect(std::get<0>(t) == 1);
+
+        ++std::get<0>(t);
+        expect(x == 2);
     };
 
     "rvalue_reference"_test = [] {
