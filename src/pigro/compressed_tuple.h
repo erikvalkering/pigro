@@ -45,17 +45,22 @@ auto make_compressed_tuple_base(Ts &&...values) {
 }
 
 template<typename... Ts>
-using compressed_tuple_base_t = decltype(make_compressed_tuple_base<Ts...>(std::declval<const Ts &>()...));
+using compressed_tuple_base_t = decltype(make_compressed_tuple_base<Ts...>(std::declval<Ts>()...));
 
 template<typename... Ts>
 struct compressed_tuple : compressed_tuple_base_t<Ts...> {
     compressed_tuple() requires(std::default_initializable<Ts> &&...)
       : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base<Ts...>(Ts{}...) } {}
 
-    explicit compressed_tuple(const Ts &...values)
-      : compressed_tuple_base_t<Ts...>{ make_compressed_tuple_base<Ts...>(values...) } {
-    }
+    template<typename... Us>
+    explicit compressed_tuple(Us &&...values)
+      : compressed_tuple_base_t<Ts...>{
+            make_compressed_tuple_base<Ts...>(static_cast<Ts...>(values)...)
+        } {}
 };
+
+template<typename... Ts>
+compressed_tuple(Ts &&...) -> compressed_tuple<std::remove_reference_t<Ts>...>;
 
 } // namespace pigro
 
