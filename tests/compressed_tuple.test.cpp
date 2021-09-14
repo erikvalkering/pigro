@@ -28,7 +28,7 @@ suite compressed_tuple_element_tests = [] {
         const auto x2 = 0;
         auto e4 = recursive{ compressed_tuple_element<0>(x2) };
         expect(e4(idx<0>) == x2);
-        expect(type<decltype(e4(idx<0>))> == type<int &>);
+        expect(type<decltype(e4(idx<0>))> == type<const int &>);
 
         auto x3 = 0;
         const auto e5 = recursive{ compressed_tuple_element<0>(x3) };
