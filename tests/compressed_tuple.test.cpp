@@ -146,6 +146,9 @@ suite compressed_tuple_tests = [] {
     "rvalue_reference"_test = [] {
         auto t = compressed_tuple{ 0 };
         expect(std::get<0>(t) == 0);
+
+        ++std::get<0>(t);
+        expect(std::get<0>(t) == 1);
     };
 
     "CTAD"_test = [] {
