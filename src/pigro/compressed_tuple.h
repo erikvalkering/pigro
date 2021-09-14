@@ -60,7 +60,7 @@ struct compressed_tuple : compressed_tuple_base_t<Ts...> {
 };
 
 template<typename... Ts>
-compressed_tuple(Ts &&...) -> compressed_tuple<std::remove_reference_t<Ts>...>;
+compressed_tuple(Ts &&...) -> compressed_tuple<std::remove_cvref_t<Ts>...>;
 
 } // namespace pigro
 
