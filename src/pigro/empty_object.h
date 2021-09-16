@@ -2,6 +2,9 @@
 
 namespace pigro {
 
+// Credits go to Louis Dionne's Dyno library:
+// https://github.com/ldionne/dyno/blob/03eaeded898225660787f03655edb89642a72e7c/include/dyno/detail/empty_object.hpp
+
 template<typename T>
 struct empty_object {
     struct T1 {
