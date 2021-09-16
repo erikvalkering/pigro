@@ -3,7 +3,8 @@
 namespace pigro::impl {
 
 // Credits go to the article:
-// "capturing perfectly-forwarded objects in lambdas", 11 december 2016
+// "capturing perfectly-forwarded objects in lambdas",
+// by Vittorio Romeo, 11 december 2016
 // https://vittorioromeo.info/index/blog/capturing_perfectly_forwarded_objects_in_lambdas.html
 
 template<typename T>
