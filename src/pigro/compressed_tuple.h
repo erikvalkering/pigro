@@ -64,6 +64,19 @@ compressed_tuple(Ts &&...) -> compressed_tuple<std::remove_cvref_t<Ts>...>;
 
 } // namespace pigro
 
+namespace pigro::concepts {
+
+template<typename>
+constexpr auto is_compressed_tuple = false;
+
+template<typename... Ts>
+constexpr auto is_compressed_tuple<pigro::compressed_tuple<Ts...>> = true;
+
+template<typename T>
+concept compressed_tuple = is_compressed_tuple<std::remove_cvref_t<T>>;
+
+} // namespace pigro::concepts
+
 namespace std {
 
 template<typename... Ts>
