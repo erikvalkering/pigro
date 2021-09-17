@@ -18,4 +18,15 @@ constexpr std::remove_cv_t<T> &as_nonconst(T &value) noexcept {
     return const_cast<std::remove_cv_t<T> &>(value);
 }
 
+template<typename From, template<typename...> class To>
+struct rebind_container;
+
+template<template<typename...> class From, template<typename...> class To, typename... Ts>
+struct rebind_container<From<Ts...>, To> {
+    using type = To<Ts...>;
+};
+
+template<typename From, template<typename...> class To>
+using rebind_container_t = rebind_container<From, To>::type;
+
 } // namespace pigro
