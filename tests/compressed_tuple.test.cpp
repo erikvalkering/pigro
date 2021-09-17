@@ -104,35 +104,35 @@ suite compressed_tuple_tests = [] {
         auto x = int{ 1 };
         auto t2 = compressed_tuple{ x };
 
-        expect(std::get<0>(t2) == x);
+        expect(pigro::get<0>(t2) == x);
         expect(sizeof(t2) == sizeof(int));
         expect(!std::is_empty_v<decltype(t2)>);
 
         auto y = double{ 2.0 };
         auto t3 = compressed_tuple{ x, y };
 
-        expect(std::get<0>(t3) == x);
-        expect(std::get<1>(t3) == y);
+        expect(pigro::get<0>(t3) == x);
+        expect(pigro::get<1>(t3) == y);
         expect(sizeof(t3) == sizeof(double) + sizeof(double));
         expect(!std::is_empty_v<decltype(t3)>);
 
         auto t4 = compressed_tuple{ empty };
 
-        expect(std::get<0>(t4) == empty);
+        expect(pigro::get<0>(t4) == empty);
         expect(sizeof(t4) == sizeof(empty));
         expect(std::is_empty_v<decltype(t4)>);
 
         auto t5 = compressed_tuple{ empty, y };
 
-        expect(std::get<0>(t5) == empty);
-        expect(std::get<1>(t5) == y);
+        expect(pigro::get<0>(t5) == empty);
+        expect(pigro::get<1>(t5) == y);
         expect(sizeof(t5) == 0 + sizeof(double));
         expect(!std::is_empty_v<decltype(t5)>);
 
         auto t6 = compressed_tuple{ y, empty };
 
-        expect(std::get<0>(t6) == y);
-        expect(std::get<1>(t6) == empty);
+        expect(pigro::get<0>(t6) == y);
+        expect(pigro::get<1>(t6) == empty);
         expect(sizeof(t6) == sizeof(double) + 0);
         expect(!std::is_empty_v<decltype(t6)>);
     };
@@ -140,21 +140,21 @@ suite compressed_tuple_tests = [] {
     "lvalue_reference"_test = [] {
         auto x = 0;
         auto t = compressed_tuple<int &>{ x };
-        expect(std::get<0>(t) == 0);
+        expect(pigro::get<0>(t) == 0);
 
         ++x;
-        expect(std::get<0>(t) == 1);
+        expect(pigro::get<0>(t) == 1);
 
-        ++std::get<0>(t);
+        ++pigro::get<0>(t);
         expect(x == 2);
     };
 
     "rvalue_reference"_test = [] {
         auto t = compressed_tuple{ 0 };
-        expect(std::get<0>(t) == 0);
+        expect(pigro::get<0>(t) == 0);
 
-        ++std::get<0>(t);
-        expect(std::get<0>(t) == 1);
+        ++pigro::get<0>(t);
+        expect(pigro::get<0>(t) == 1);
     };
 
     "CTAD"_test = [] {
