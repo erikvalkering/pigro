@@ -77,6 +77,15 @@ concept compressed_tuple = is_compressed_tuple<std::remove_cvref_t<T>>;
 
 } // namespace pigro::concepts
 
+namespace pigro {
+
+template<size_t I>
+constexpr auto get(concepts::compressed_tuple auto &&t) -> decltype(std::forward<decltype(t)>(t)(pigro::idx<I>)) {
+    return std::forward<decltype(t)>(t)(pigro::idx<I>);
+}
+
+} // namespace pigro
+
 namespace std {
 
 template<pigro::concepts::compressed_tuple T>
@@ -86,15 +95,5 @@ struct tuple_size<T> : std::tuple_size<rebind_container_t<std::remove_cvref_t<T>
 template<size_t I, pigro::concepts::compressed_tuple T>
 struct tuple_element<I, T> : std::tuple_element<I, rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
 };
-
-template<size_t I, typename... Ts>
-constexpr decltype(auto) get(pigro::compressed_tuple<Ts...> &t) {
-    return t(pigro::idx<I>);
-}
-
-template<size_t I, typename... Ts>
-constexpr decltype(auto) get(const pigro::compressed_tuple<Ts...> &t) {
-    return t(pigro::idx<I>);
-}
 
 } // namespace std
