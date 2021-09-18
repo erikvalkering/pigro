@@ -222,6 +222,22 @@ suite compressed_tuple_tests = [] {
         expect(type<std::tuple_element_t<0, const compressed_tuple<int> &&>> == type<int>);
     };
 
+    "pigro::get ADL"_test = [] {
+        auto t = compressed_tuple{ 0 };
+
+        expect(get<0>(t) == 0_i);
+        expect(type<decltype(get<0>(t)))> == type<int &>);
+
+        expect(get<0>(static_cast<decltype(t) &&>(t)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<decltype(t) &&>(t)))> == type<int &&>);
+
+        expect(get<0>(static_cast<const decltype(t) &>(t)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<const decltype(t) &>(t)))> == type<const int &>);
+
+        expect(get<0>(static_cast<const decltype(t) &&>(t)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<const decltype(t) &&>(t)))> == type<const int &&>);
+    };
+
     "pigro::apply"_test = [] {
         auto t = compressed_tuple{ 1, 2, 3 };
         auto f = [](int, int, int) { return 1; };
