@@ -1,6 +1,7 @@
 add_executable(tests
     tests.cpp
 
+    apply.test.cpp
     bind_tuple.test.cpp
     compressed_tuple.test.cpp
     lazy.test.cpp
