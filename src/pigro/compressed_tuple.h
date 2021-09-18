@@ -79,9 +79,9 @@ concept compressed_tuple = is_compressed_tuple<std::remove_cvref_t<T>>;
 
 namespace pigro {
 
-template<size_t I>
-constexpr auto get(concepts::compressed_tuple auto &&t) -> decltype(std::forward<decltype(t)>(t)(pigro::idx<I>)) {
-    return std::forward<decltype(t)>(t)(pigro::idx<I>);
+template<size_t I, concepts::compressed_tuple T>
+constexpr auto get(T &&t) -> decltype(std::forward<T>(t)(pigro::idx<I>)) {
+    return std::forward<T>(t)(pigro::idx<I>);
 }
 
 } // namespace pigro
