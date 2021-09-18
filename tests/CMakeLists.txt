@@ -1,4 +1,6 @@
 add_executable(tests
+    tests.cpp
+
     bind_tuple.test.cpp
     compressed_tuple.test.cpp
     lazy.test.cpp
@@ -7,7 +9,6 @@ add_executable(tests
     partition.test.cpp
     recursive.test.cpp
     regular_void.test.cpp
-    tests.cpp
     tuple_algorithms.test.cpp
     uncapture.test.cpp
     utils.test.cpp
