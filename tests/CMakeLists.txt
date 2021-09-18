@@ -10,6 +10,7 @@ add_executable(tests
     tests.cpp
     tuple_algorithms.test.cpp
     uncapture.test.cpp
+    utils.test.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
 target_include_directories(tests PRIVATE ../extlib)
