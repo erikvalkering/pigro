@@ -79,24 +79,12 @@ concept compressed_tuple = is_compressed_tuple<std::remove_cvref_t<T>>;
 
 namespace std {
 
-template<typename... Ts>
-struct tuple_size<pigro::compressed_tuple<Ts...>>
-  : std::integral_constant<size_t, sizeof...(Ts)> {
+template<pigro::concepts::compressed_tuple T>
+struct tuple_size<T> : std::tuple_size<rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
 };
 
-template<typename... Ts>
-struct tuple_size<const pigro::compressed_tuple<Ts...>>
-  : std::integral_constant<size_t, sizeof...(Ts)> {
-};
-
-template<typename... Ts>
-struct tuple_size<pigro::compressed_tuple<Ts...> &&>
-  : std::integral_constant<size_t, sizeof...(Ts)> {
-};
-
-template<typename... Ts>
-struct tuple_size<const pigro::compressed_tuple<Ts...> &&>
-  : std::integral_constant<size_t, sizeof...(Ts)> {
+template<size_t I, pigro::concepts::compressed_tuple T>
+struct tuple_element<I, T> : std::tuple_element<I, rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
 };
 
 template<size_t I, typename... Ts>
@@ -108,10 +96,5 @@ template<size_t I, typename... Ts>
 constexpr decltype(auto) get(const pigro::compressed_tuple<Ts...> &t) {
     return t(pigro::idx<I>);
 }
-
-template<size_t I, typename... Ts>
-struct tuple_element<I, pigro::compressed_tuple<Ts...>> {
-    using type = decltype(std::get<I>(std::declval<pigro::compressed_tuple<Ts...>>()));
-};
 
 } // namespace std
