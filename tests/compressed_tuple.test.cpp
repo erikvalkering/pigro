@@ -237,13 +237,6 @@ suite compressed_tuple_tests = [] {
         expect(get<0>(static_cast<const decltype(t) &&>(t)) == 0_i);
         expect(type<decltype(get<0>(static_cast<const decltype(t) &&>(t)))> == type<const int &&>);
     };
-
-    "pigro::apply"_test = [] {
-        auto t = compressed_tuple{ 1, 2, 3 };
-        auto f = [](int, int, int) { return 1; };
-
-        expect(pigro::apply(f, t) == 1_i);
-    };
 };
 
 } // namespace pigro::tests
