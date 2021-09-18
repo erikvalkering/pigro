@@ -202,6 +202,12 @@ suite compressed_tuple_tests = [] {
         expect(std::tuple_size_v<compressed_tuple<int>> == 1_i);
         expect(std::tuple_size_v<compressed_tuple<int, float>> == 2_i);
         expect(std::tuple_size_v<compressed_tuple<int, int, int>> == 3_i);
+
+        expect(std::tuple_size_v<compressed_tuple<> &> == 0_i);
+        expect(std::tuple_size_v<compressed_tuple<> &&> == 0_i);
+        expect(std::tuple_size_v<const compressed_tuple<>> == 0_i);
+        expect(std::tuple_size_v<const compressed_tuple<> &> == 0_i);
+        expect(std::tuple_size_v<const compressed_tuple<> &&> == 0_i);
     };
 
     "pigro::apply"_test = [] {
