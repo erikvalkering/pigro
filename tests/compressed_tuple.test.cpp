@@ -197,6 +197,19 @@ suite compressed_tuple_tests = [] {
         expect(concepts::tuple_like<compressed_tuple<const int &&>>);
     };
 
+    "pigro::concepts::compressed_tuple"_test = [] {
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<>>);
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<int>>);
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<int, float>>);
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<int, int, int>>);
+
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<> &>);
+        expect(pigro::concepts::compressed_tuple<compressed_tuple<> &&>);
+        expect(pigro::concepts::compressed_tuple<const compressed_tuple<>>);
+        expect(pigro::concepts::compressed_tuple<const compressed_tuple<> &>);
+        expect(pigro::concepts::compressed_tuple<const compressed_tuple<> &&>);
+    };
+
     "std::tuple_size_v"_test = [] {
         expect(std::tuple_size_v<compressed_tuple<>> == 0_i);
         expect(std::tuple_size_v<compressed_tuple<int>> == 1_i);
