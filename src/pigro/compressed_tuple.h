@@ -89,11 +89,11 @@ constexpr auto get(T &&t) -> decltype(std::forward<T>(t)(pigro::idx<I>)) {
 namespace std {
 
 template<pigro::concepts::compressed_tuple T>
-struct tuple_size<T> : std::tuple_size<rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
+struct tuple_size<T> : std::tuple_size<pigro::rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
 };
 
 template<size_t I, pigro::concepts::compressed_tuple T>
-struct tuple_element<I, T> : std::tuple_element<I, rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
+struct tuple_element<I, T> : std::tuple_element<I, pigro::rebind_container_t<std::remove_cvref_t<T>, std::tuple>> {
 };
 
 } // namespace std
