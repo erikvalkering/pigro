@@ -230,9 +230,9 @@ suite compressed_tuple_tests = [] {
 
         expect(type<std::tuple_element_t<0, compressed_tuple<int> &>> == type<int>);
         expect(type<std::tuple_element_t<0, compressed_tuple<int> &&>> == type<int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int>>> == type<int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &>> == type<int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &&>> == type<int>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int>>> == type<const int>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &>> == type<const int>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &&>> == type<const int>);
     };
 
     "pigro::get ADL"_test = [] {
