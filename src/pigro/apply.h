@@ -3,7 +3,6 @@
 #include <tuple>
 #include <type_traits>
 
-
 namespace pigro {
 
 template<size_t... idx>
