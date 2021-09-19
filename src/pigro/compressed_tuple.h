@@ -26,7 +26,7 @@ template<size_t tag, typename T>
 auto compressed_tuple_element(T &&value) {
     return overload{
         [](auto &&self, idx_t<tag>) -> decltype(auto) {
-            return std::as_const(as_nonconst(self)(idx<tag>));
+            return forward_like<decltype(self)>(as_nonconst(std::forward<decltype(self)>(self))(idx<tag>));
         },
         [value = fwd_capture(std::forward<T>(value))](auto &&self, idx_t<tag>) mutable -> decltype(auto) {
             return forward_like<decltype(self)>(value).get();
