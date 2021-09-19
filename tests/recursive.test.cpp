@@ -103,6 +103,24 @@ suite recursive_tests = [] {
         expect(type<decltype(cf())> == type<const decltype(f) &>);
         expect(type<decltype(std::move(cf)())> == type<const decltype(f) &&>);
     };
+
+    "perfect_forwarding"_test = [] {
+        struct Foo {
+            auto operator()(auto &&self) & { return 1; }
+            auto operator()(auto &&self) && { return 2; }
+            auto operator()(auto &&self) const & { return 3; }
+            auto operator()(auto &&self) const && { return 4; }
+        };
+
+        auto f = recursive{ Foo{} };
+
+        expect(f() == 1);
+        expect(std::move(f)() == 2);
+
+        const auto cf = f;
+        expect(cf() == 3);
+        expect(std::move(cf)() == 4);
+    };
 };
 
 } // namespace pigro::tests
