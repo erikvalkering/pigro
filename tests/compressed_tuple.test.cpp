@@ -236,7 +236,7 @@ suite compressed_tuple_tests = [] {
         auto ct = compressed_tuple{ 0 };
 
         expect(get<0>(ct) == 0_i);
-        expect(type<decltype(get<0>(ct))> == type<decltype(std::get<0>(ct))>);
+        expect(type<decltype(get<0>(ct))> == type<decltype(std::get<0>(t))>);
 
         expect(get<0>(static_cast<decltype(ct) &&>(ct)) == 0_i);
         expect(type<decltype(get<0>(static_cast<decltype(ct) &&>(ct)))> == type<decltype(std::get<0>(static_cast<decltype(t) &&>(t)))>);
