@@ -20,6 +20,11 @@ constexpr decltype(auto) as_nonconst(T &value) noexcept {
     return const_cast<std::remove_cv_t<T> &>(value);
 }
 
+template<typename T>
+constexpr decltype(auto) as_nonconst(T &&value) noexcept {
+    return const_cast<std::remove_cv_t<T> &&>(value);
+}
+
 template<typename From, template<typename...> class To>
 struct rebind_container;
 
