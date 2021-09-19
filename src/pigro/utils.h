@@ -16,7 +16,7 @@ template<size_t index>
 constexpr auto idx = idx_t<index>{};
 
 template<typename T>
-constexpr std::remove_cv_t<T> &as_nonconst(T &value) noexcept {
+constexpr decltype(auto) as_nonconst(T &value) noexcept {
     return const_cast<std::remove_cv_t<T> &>(value);
 }
 
