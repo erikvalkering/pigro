@@ -232,19 +232,20 @@ suite compressed_tuple_tests = [] {
     };
 
     "pigro::get ADL"_test = [] {
-        auto t = compressed_tuple{ 0 };
+        auto t = std::tuple{ 0 };
+        auto ct = compressed_tuple{ 0 };
 
-        expect(get<0>(t) == 0_i);
-        expect(type<decltype(get<0>(t))> == type<int &>);
+        expect(get<0>(ct) == 0_i);
+        expect(type<decltype(get<0>(ct))> == type<decltype(std::get<0>(ct))>);
 
-        expect(get<0>(static_cast<decltype(t) &&>(t)) == 0_i);
-        expect(type<decltype(get<0>(static_cast<decltype(t) &&>(t)))> == type<int &&>);
+        expect(get<0>(static_cast<decltype(ct) &&>(ct)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<decltype(ct) &&>(ct)))> == type<decltype(std::get<0>(static_cast<decltype(t) &&>(t)))>);
 
-        expect(get<0>(static_cast<const decltype(t) &>(t)) == 0_i);
-        expect(type<decltype(get<0>(static_cast<const decltype(t) &>(t)))> == type<const int &>);
+        expect(get<0>(static_cast<const decltype(ct) &>(ct)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<const decltype(ct) &>(ct)))> == type<decltype(std::get<0>(static_cast<const decltype(t) &>(t)))>);
 
-        expect(get<0>(static_cast<const decltype(t) &&>(t)) == 0_i);
-        expect(type<decltype(get<0>(static_cast<const decltype(t) &&>(t)))> == type<const int &&>);
+        expect(get<0>(static_cast<const decltype(ct) &&>(ct)) == 0_i);
+        expect(type<decltype(get<0>(static_cast<const decltype(ct) &&>(ct)))> == type<decltype(std::get<0>(static_cast<const decltype(t) &&>(t)))>);
     };
 };
 
