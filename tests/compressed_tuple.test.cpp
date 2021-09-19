@@ -224,15 +224,15 @@ suite compressed_tuple_tests = [] {
     };
 
     "std::tuple_element_t"_test = [] {
-        expect(type<std::tuple_element_t<0, compressed_tuple<int, float, double>>> == type<int>);
-        expect(type<std::tuple_element_t<1, compressed_tuple<int, float, double>>> == type<float>);
-        expect(type<std::tuple_element_t<2, compressed_tuple<int, float, double>>> == type<double>);
+        expect(type<std::tuple_element_t<0, compressed_tuple<int, float, double>>> == type<std::tuple_element_t<0, std::tuple<int, float, double>>>);
+        expect(type<std::tuple_element_t<1, compressed_tuple<int, float, double>>> == type<std::tuple_element_t<1, std::tuple<int, float, double>>>);
+        expect(type<std::tuple_element_t<2, compressed_tuple<int, float, double>>> == type<std::tuple_element_t<2, std::tuple<int, float, double>>>);
 
-        expect(type<std::tuple_element_t<0, compressed_tuple<int> &>> == type<int>);
-        expect(type<std::tuple_element_t<0, compressed_tuple<int> &&>> == type<int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int>>> == type<const int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &>> == type<const int>);
-        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &&>> == type<const int>);
+        expect(type<std::tuple_element_t<0, compressed_tuple<int> &>> == type<std::tuple_element_t<0, std::tuple<int> &>>);
+        expect(type<std::tuple_element_t<0, compressed_tuple<int> &&>> == type<std::tuple_element_t<0, std::tuple<int> &&>>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int>>> == type<std::tuple_element_t<0, const std::tuple<int>>>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &>> == type<std::tuple_element_t<0, const std::tuple<int> &>>);
+        expect(type<std::tuple_element_t<0, const compressed_tuple<int> &&>> == type<std::tuple_element_t<0, const std::tuple<int> &&>>);
     };
 
     "pigro::get ADL"_test = [] {
