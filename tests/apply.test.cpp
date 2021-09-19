@@ -28,7 +28,7 @@ suite apply_tests = [] {
 
         auto g = overload{
             [=](auto t) -> decltype(pigro::apply(f, t)) { return pigro::apply(f, t); },
-            [](auto t) { return 2; },
+            [](...) { return 2; },
         };
 
         expect(g(pigro::compressed_tuple{ nullptr }) == 1_i);
