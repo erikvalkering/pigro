@@ -90,6 +90,19 @@ suite recursive_tests = [] {
         const auto f = recursive{ [](auto) {} };
         const auto g = decltype(f){};
     };
+
+    "value_categories"_test = [] {
+        auto f = recursive{
+            [](auto &&self) -> decltype(auto) { return std::forward<decltype(self)>(self); }
+        };
+
+        expect(type<decltype(f())> == type<decltype(f) &>);
+        expect(type<decltype(std::move(f)())> == type<decltype(f) &&>);
+
+        const auto cf = f;
+        expect(type<decltype(cf())> == type<const decltype(f) &>);
+        expect(type<decltype(std::move(cf)())> == type<const decltype(f) &&>);
+    };
 };
 
 } // namespace pigro::tests
