@@ -19,7 +19,7 @@ public:
 
     auto &get() & { return _x; }
     const auto &get() const & { return _x; }
-    auto get() && { return std::move(_x); }
+    auto &&get() && { return std::move(_x); }
 };
 
 template<typename T>
@@ -33,7 +33,7 @@ public:
 
     auto &get() & { return _x.get(); }
     const auto &get() const & { return _x.get(); }
-    auto get() && { return std::move(_x.get()); }
+    auto &&get() && { return std::move(_x.get()); }
 };
 
 template<typename T>
