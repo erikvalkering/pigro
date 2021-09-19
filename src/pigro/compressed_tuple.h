@@ -2,6 +2,7 @@
 
 #include "concepts.h"
 #include "empty_object.h"
+#include "forward_like.h"
 #include "fwd_capture.h"
 #include "overload.h"
 #include "pack_algorithms.h"
@@ -28,7 +29,7 @@ auto compressed_tuple_element(T &&value) {
             return std::as_const(as_nonconst(self)(idx<tag>));
         },
         [value = fwd_capture(std::forward<T>(value))](auto &&self, idx_t<tag>) mutable -> decltype(auto) {
-            return value.get();
+            return forward_like<decltype(self)>(value).get();
         },
     };
 }
