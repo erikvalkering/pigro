@@ -4,6 +4,7 @@
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
 
+#include <memory>
 #include <tuple>
 #include <type_traits>
 
