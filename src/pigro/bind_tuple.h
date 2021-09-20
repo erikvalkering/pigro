@@ -21,11 +21,11 @@ auto bind_front_tuple(auto &&f, concepts::tuple_like auto &&t) {
         overload{
           compressed_tuple_element<0>(std::forward<decltype(f)>(f)),
           compressed_tuple_element<1>(std::forward<decltype(t)>(t)),
-          [](auto &&self, auto &&...args) -> decltype(pigro::apply(f, t)) {
+          [](auto &&self, auto &&...args) {
               auto &&f = self(idx<0>);
               auto &&t = self(idx<1>);
 
-              return pigro::apply(f, t);
+              return pigro::apply(bind_back(f, std::forward<decltype(args)>(args)...), t);
           },
         }
     };
