@@ -11,8 +11,8 @@ struct Item {
     T value;
     constexpr static auto index = idx;
 };
-template<typename... Pack, typename F>
-auto enumerate_pack(F &&f, Pack &&...pack) {
+
+auto enumerate_pack(auto &&f, auto &&...pack) {
     return [&, t = std::tuple<decltype(pack)...>{ std::forward<decltype(pack)>(pack)... } ]<size_t... idx>(std::index_sequence<idx...>) mutable {
         return f(
           Item<
