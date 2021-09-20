@@ -53,7 +53,7 @@ constexpr auto lazy(auto f, concepts::lazy_function auto... deps) {
         auto changed = !cache || any(args, is_changed);
         if (changed) {
             const auto values = transform(args, value);
-            const auto result = apply(f, values);
+            const auto result = std::apply(f, values);
 
             changed = cache != result;
             cache = std::move(result);
