@@ -31,8 +31,27 @@ auto bind_front_tuple(auto &&f, concepts::tuple_like auto &&t) {
     };
 }
 
+auto bind_back_tuple(auto &&f, concepts::tuple_like auto &&t) {
+    return recursive{
+        overload{
+          compressed_tuple_element<0>(std::forward<decltype(f)>(f)),
+          compressed_tuple_element<1>(std::forward<decltype(t)>(t)),
+          [](auto &&self, auto &&...args) {
+              auto &&f = self(idx<0>);
+              auto &&t = self(idx<1>);
+
+              return pigro::apply(std::bind_front(f, std::forward<decltype(args)>(args)...), t);
+          },
+        }
+    };
+}
+
 auto operator>>(concepts::tuple_like auto &&args, auto &&f) {
     return bind_front_tuple(std::forward<decltype(f)>(f), std::forward<decltype(args)>(args));
+}
+
+auto operator<<(concepts::tuple_like auto &&args, auto &&f) {
+    return bind_back_tuple(std::forward<decltype(f)>(f), std::forward<decltype(args)>(args));
 }
 
 } // namespace pigro
