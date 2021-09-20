@@ -7,6 +7,12 @@
 
 namespace pigro {
 
+auto bind_back(auto f, auto... back_args) {
+    return [=](auto... front_args) {
+        return std::invoke(f, front_args..., back_args...);
+    };
+}
+
 auto bind_front_tuple(auto &&f, concepts::tuple_like auto &&t) {
     return recursive{
         overload{

@@ -115,4 +115,13 @@ suite bind_tuple_tests = [] {
     };
 };
 
+suite bind_back_tests = [] {
+    "by_value"_test = [] {
+        auto sum = [](int a, int b) { return a + b; };
+        auto inc = bind_back(sum, 1);
+
+        expect(inc(0) == 1_i);
+    };
+};
+
 } // namespace pigro::tests
