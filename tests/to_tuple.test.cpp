@@ -17,6 +17,29 @@ suite to_tuple_tests = [] {
         expect(type<decltype(to_tuple(std::declval<const compressed_tuple<> &>()))> == type<std::tuple<>>);
         expect(type<decltype(to_tuple(std::declval<const compressed_tuple<> &&>()))> == type<std::tuple<>>);
     };
+
+    "single parameter (changing)"_test = [] {
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int> &>()))> == type<std::tuple<int &>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int> &&>()))> == type<std::tuple<int &&>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int &> &>()))> == type<std::tuple<int &>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int &> &&>()))> == type<std::tuple<int &&>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int &&> &>()))> == type<std::tuple<int &>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<int &&> &&>()))> == type<std::tuple<int &&>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<const int &> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<const int &> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<const int &&> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<compressed_tuple<const int &&> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int &> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int &> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int &&> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<int &&> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<const int &> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<const int &> &&>()))> == type<std::tuple<const int &&>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<const int &&> &>()))> == type<std::tuple<const int &>>);
+        expect(type<decltype(to_tuple(std::declval<const compressed_tuple<const int &&> &&>()))> == type<std::tuple<const int &&>>);
+    };
 };
 
 } // namespace pigro::tests
