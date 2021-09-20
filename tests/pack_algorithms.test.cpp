@@ -96,6 +96,23 @@ suite pack_algorithms_tests = [] {
         auto x = 0;
         tester(true, x);
     };
+
+    "value_categories_2"_test = [] {
+        auto x = std::make_unique<int>(0);
+        enumerate_pack(
+          [](auto &&item) {
+              item.value = std::make_unique<int>(item.index + 1);
+          },
+          x);
+        expect(*x == 1);
+
+        enumerate_pack(
+          [](auto &&item) {
+              auto y = std::forward<decltype(item.value)>(item.value);
+          },
+          std::move(x));
+        expect(x == nullptr);
+    };
 };
 
 } // namespace pigro::tests
