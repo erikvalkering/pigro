@@ -1,5 +1,8 @@
 #pragma once
 
+#include "bind_tuple.h"
+#include "compressed_tuple.h"
+
 #include <concepts>
 #include <optional>
 
@@ -10,7 +13,7 @@ struct regular_void {
 };
 
 constexpr auto regularized_void(auto f) {
-    return [=](auto... args) mutable {
+    return compressed_tuple{ f } >> [](auto f, auto... args) mutable {
         using result_t = decltype(f(args...));
 
         if constexpr (std::same_as<result_t, void>) {
@@ -23,7 +26,7 @@ constexpr auto regularized_void(auto f) {
 }
 
 constexpr auto unregularized_void(auto f) {
-    return [=](auto... args) mutable {
+    return compressed_tuple{ f } >> [](auto f, auto... args) mutable {
         using result_t = decltype(f(args...));
 
         if constexpr (std::same_as<result_t, regular_void>) {
