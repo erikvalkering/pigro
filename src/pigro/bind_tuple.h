@@ -6,6 +6,8 @@
 #include "fwd_capture.h"
 #include "pack_algorithms.h"
 
+#include <functional>
+
 namespace pigro {
 
 auto bind_back(auto &&f, auto... back_args) {
