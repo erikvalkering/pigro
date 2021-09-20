@@ -122,6 +122,13 @@ suite bind_back_tests = [] {
 
         expect(inc(0) == 1_i);
     };
+
+    "perfect_forward_front"_test = [] {
+        auto sum = [](std::unique_ptr<int> a, int b) { return *a + b; };
+        auto inc = bind_back(sum, 1);
+
+        expect(inc(std::make_unique<int>(0)) == 1_i);
+    };
 };
 
 } // namespace pigro::tests
