@@ -129,6 +129,20 @@ suite bind_back_tests = [] {
 
         expect(inc(std::make_unique<int>(0)) == 1_i);
     };
+
+    "perfect_forward_callable"_test = [] {
+        struct move_only_summer {
+            move_only_summer() = default;
+            move_only_summer(const move_only_summer &) = delete;
+            move_only_summer(move_only_summer &&) = default;
+
+            auto operator()(int a, int b) const { return a + b; }
+        };
+
+        auto inc = bind_back(move_only_summer{}, 1);
+
+        expect(inc(0) == 1_i);
+    };
 };
 
 } // namespace pigro::tests

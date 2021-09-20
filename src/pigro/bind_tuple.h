@@ -7,8 +7,8 @@
 
 namespace pigro {
 
-auto bind_back(auto f, auto... back_args) {
-    return [=](auto &&...front_args) {
+auto bind_back(auto &&f, auto... back_args) {
+    return [=, f = std::forward<decltype(f)>(f)](auto &&...front_args) {
         return std::invoke(f, std::forward<decltype(front_args)>(front_args)..., back_args...);
     };
 }
