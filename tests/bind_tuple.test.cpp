@@ -87,7 +87,7 @@ suite bind_tuple_tests = [] {
 
     "remember_state"_test = [=] {
         auto x = 0;
-        auto f = compressed_tuple<int &>{ x } >> [](auto &x) { x++; };
+        auto f = compressed_tuple<int &>{ x } >> [](int &x) { x++; };
 
         expect(f() == 0_i);
         expect(f() == 1_i);
