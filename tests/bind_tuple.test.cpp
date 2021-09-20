@@ -143,6 +143,21 @@ suite bind_back_tests = [] {
 
         expect(inc(0) == 1_i);
     };
+
+    "lvalue_reference_callable"_test = [] {
+        struct unmoveable_summer {
+            unmoveable_summer() = default;
+            unmoveable_summer(const unmoveable_summer &) = delete;
+            unmoveable_summer(unmoveable_summer &&) = delete;
+
+            auto operator()(int a, int b) const { return a + b; }
+        };
+
+        auto sum = unmoveable_summer{};
+        auto inc = bind_back(sum, 1);
+
+        expect(inc(0) == 1_i);
+    };
 };
 
 } // namespace pigro::tests

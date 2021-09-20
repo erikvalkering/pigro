@@ -3,13 +3,14 @@
 #include "apply.h"
 #include "compressed_tuple.h"
 #include "concepts.h"
+#include "fwd_capture.h"
 #include "pack_algorithms.h"
 
 namespace pigro {
 
 auto bind_back(auto &&f, auto... back_args) {
-    return [=, f = std::forward<decltype(f)>(f)](auto &&...front_args) {
-        return std::invoke(f, std::forward<decltype(front_args)>(front_args)..., back_args...);
+    return [=, f = fwd_capture(std::forward<decltype(f)>(f))](auto &&...front_args) {
+        return std::invoke(access(f), std::forward<decltype(front_args)>(front_args)..., back_args...);
     };
 }
 
