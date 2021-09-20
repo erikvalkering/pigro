@@ -10,6 +10,7 @@ add_executable(tests
     partition.test.cpp
     recursive.test.cpp
     regular_void.test.cpp
+    to_tuple.test.cpp
     tuple_algorithms.test.cpp
     uncapture.test.cpp
     utils.test.cpp
