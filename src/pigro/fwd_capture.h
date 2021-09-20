@@ -19,9 +19,4 @@ decltype(auto) access(T &&x) {
     return std::get<0>(std::forward<T>(x));
 }
 
-template<typename... Ts>
-auto fwd_capture_as_tuple(Ts &&...xs) {
-    return std::make_tuple(fwd_capture(std::forward<Ts>(xs)...));
-}
-
 } // namespace pigro
