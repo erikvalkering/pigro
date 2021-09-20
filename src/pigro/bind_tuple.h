@@ -10,9 +10,9 @@
 
 namespace pigro {
 
-auto bind_back(auto &&f, auto... back_args) {
-    return [=, f = fwd_capture(std::forward<decltype(f)>(f))](auto &&...front_args) {
-        return std::invoke(access(f), std::forward<decltype(front_args)>(front_args)..., back_args...);
+auto bind_back(auto &&f, auto &&...back_args) {
+    return [f = fwd_capture(std::forward<decltype(f)>(f)), ... back_args = fwd_capture(std::forward<decltype(back_args)>(back_args))](auto &&...front_args) mutable {
+        return std::invoke(access(f), std::forward<decltype(front_args)>(front_args)..., access(back_args)...);
     };
 }
 
