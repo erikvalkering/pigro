@@ -9,9 +9,9 @@ namespace pigro {
 // by Vittorio Romeo, 11 december 2016
 // https://vittorioromeo.info/index/blog/capturing_perfectly_forwarded_objects_in_lambdas.html
 
-template<typename... Ts>
-auto fwd_capture(Ts &&...xs) {
-    return std::tuple<Ts...>{ std::forward<Ts>(xs)... };
+template<typename T>
+auto fwd_capture(T &&x) {
+    return std::tuple<T>{ std::forward<T>(x) };
 }
 
 template<typename T>
