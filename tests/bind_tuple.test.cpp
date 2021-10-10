@@ -1,5 +1,6 @@
 #include "../src/pigro/bind_tuple.h"
 #include "../src/pigro/compressed_tuple.h"
+#include "../src/pigro/overload.h"
 
 #define BOOST_UT_DISABLE_MODULE
 #include <boost/ut.hpp>
