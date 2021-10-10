@@ -168,4 +168,23 @@ suite bind_back_tests = [] {
     };
 };
 
+suite bind_back_tuple_tests = [] {
+    "bind_back_tuple"_test = [] {
+        auto f = compressed_tuple{ 1 } << [](auto x, auto y) { return (x - y); };
+
+        expect(f(3) == 2_i);
+    };
+
+    "lambda"_test = [] {
+        auto f = [] { return 1; };
+        auto g = overload{
+            compressed_tuple{ f } << [](const int &x, auto f) { return f() + x; },
+            [](const double &) { return 4; },
+        };
+
+        expect(g(2) == 3_i);
+        expect(g(2.0) == 4_i);
+    };
+};
+
 } // namespace pigro::tests
