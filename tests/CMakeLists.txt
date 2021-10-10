@@ -17,3 +17,7 @@ add_executable(tests
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 20)
 target_include_directories(tests PRIVATE ../extlib)
+target_compile_options(tests PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+)
