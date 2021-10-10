@@ -166,6 +166,19 @@ suite bind_back_tests = [] {
 
         expect(inc(0) == 1_i);
     };
+
+    "SFINAE-friendliness"_test = [] {
+        auto lift = [](auto f) { return [=](auto... args) { return f(args...); }; };
+
+        auto f = overload{
+            lift([](nullptr_t) { return 1; }),
+            //bind_back([](nullptr_t, int) { return 1; }, 0),
+            [](double) { return 2; },
+        };
+
+        expect(f(nullptr) == 1_i);
+        expect(f(1.0) == 2_i);
+    };
 };
 
 suite bind_back_tuple_tests = [] {
