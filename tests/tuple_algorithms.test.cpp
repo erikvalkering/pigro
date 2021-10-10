@@ -38,15 +38,15 @@ suite tuple_algorithms_tests = [] {
     };
 
     "any_with_predicate"_test = [] {
-        constexpr auto predicate = [](auto x) { return x == "true"s; };
+        constexpr auto pred = [](auto x) { return x == "true"s; };
 
-        expect(any(tuple{ "false" }, predicate) == false);
-        expect(any(tuple{ "true" }, predicate) == true);
+        expect(any(tuple{ "false" }, pred) == false);
+        expect(any(tuple{ "true" }, pred) == true);
 
-        expect(any(tuple{ "false", "false" }, predicate) == false);
-        expect(any(tuple{ "false", "true" }, predicate) == true);
-        expect(any(tuple{ "true", "false" }, predicate) == true);
-        expect(any(tuple{ "true", "true" }, predicate) == true);
+        expect(any(tuple{ "false", "false" }, pred) == false);
+        expect(any(tuple{ "false", "true" }, pred) == true);
+        expect(any(tuple{ "true", "false" }, pred) == true);
+        expect(any(tuple{ "true", "true" }, pred) == true);
     };
 };
 
