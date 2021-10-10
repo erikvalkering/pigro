@@ -98,10 +98,10 @@ suite pack_algorithms_tests = [] {
     };
 
     "value_categories_2"_test = [] {
-        auto x = std::make_unique<int>(0);
+        auto x = std::make_unique<size_t>(0);
         enumerate_pack(
           [](auto &&item) {
-              item.value = std::make_unique<int>(item.index + 1);
+              item.value = std::make_unique<size_t>(item.index + 1);
           },
           x);
         expect(*x == 1);
