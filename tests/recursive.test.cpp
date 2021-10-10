@@ -33,9 +33,9 @@ suite recursive_tests = [] {
 
     "recursive_overload"_test = [] {
         const auto f = recursive{ overload{
-          [](auto self, int) { return "int"s; },
-          [](auto self, double) { return "double"s; },
-          [](auto self, auto) { return "auto"s; },
+          [](auto, int) { return "int"s; },
+          [](auto, double) { return "double"s; },
+          [](auto, auto) { return "auto"s; },
           [](auto self, string) { return self(0); },
         } };
 
@@ -48,7 +48,7 @@ suite recursive_tests = [] {
     "state"_test = [] {
         const auto g = [] { return 0; };
         const auto h = recursive{ overload{
-          [=](auto self) { return g(); },
+          [=](auto) { return g(); },
         } };
 
         expect(h() == 0_i);
@@ -56,7 +56,7 @@ suite recursive_tests = [] {
 
     "mutable"_test = [] {
         auto k = recursive{ overload{
-          [](auto self) mutable { return 0; },
+          [](auto) mutable { return 0; },
         } };
 
         expect(k() == 0_i);
@@ -106,10 +106,10 @@ suite recursive_tests = [] {
 
     "perfect_forwarding"_test = [] {
         struct Foo {
-            auto operator()(auto &&self) & { return 1; }
-            auto operator()(auto &&self) && { return 2; }
-            auto operator()(auto &&self) const & { return 3; }
-            auto operator()(auto &&self) const && { return 4; }
+            auto operator()(auto &&) & { return 1; }
+            auto operator()(auto &&) && { return 2; }
+            auto operator()(auto &&) const & { return 3; }
+            auto operator()(auto &&) const && { return 4; }
         };
 
         auto f = recursive{ Foo{} };
