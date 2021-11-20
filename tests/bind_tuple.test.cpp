@@ -35,6 +35,15 @@ auto stateful_test() {
     // TODO: test non-default-constructible types
 }
 
+auto remember_state_test() {
+    auto x = 0;
+    auto f = compressed_tuple<int &>{ x } >> [](auto &x) { return x++; };
+
+    expect_that(f() == 0);
+    expect_that(f() == 1);
+    expect_that(f() == 2);
+}
+
 suite bind_tuple_tests = [] {
     auto empty = Empty{};
 
@@ -93,14 +102,8 @@ suite bind_tuple_tests = [] {
         expect(f() == 0);
     };
 
-    "remember_state"_test = [=] {
-        auto x = 0;
-        auto f = compressed_tuple<int &>{ x } >> [](int &x) { x++; };
+    "remember_state"_test = remember_state_test;
 
-        expect(f() == 0_i);
-        expect(f() == 1_i);
-        expect(f() == 2_i);
-    };
 
     "size"_test = [=] {
         auto x = 1;
