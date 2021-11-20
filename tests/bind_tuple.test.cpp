@@ -18,6 +18,23 @@ struct Empty {
     auto operator<=>(const Empty &) const = default;
 };
 
+auto expect_that(bool x) {
+    if (!x) throw false;
+}
+
+auto stateful_test() {
+    auto f1 = compressed_tuple{ 1 } >> [](auto arg) { return arg; };
+    expect_that(f1() == 1);
+    expect_that(!std::is_empty_v<decltype(f1)>);
+
+    auto f2 = compressed_tuple{ 1, 2, 3, 4 } >> [](auto... args) { return (args + ...); };
+    expect_that(f2() == 10);
+    expect_that(!std::is_empty_v<decltype(f2)>);
+
+    // TODO: test whether no copies are being made
+    // TODO: test non-default-constructible types
+}
+
 suite bind_tuple_tests = [] {
     auto empty = Empty{};
 
@@ -41,17 +58,7 @@ suite bind_tuple_tests = [] {
         expect(std::is_empty_v<decltype(f4)>);
     };
 
-    "stateful"_test = [=] {
-        auto f1 = compressed_tuple{ 1 } >> [](auto arg) { return arg; };
-        expect(f1() == 1_i);
-        expect(!std::is_empty_v<decltype(f1)>);
-
-        auto f2 = compressed_tuple{ 1, 2, 3, 4 } >> [](auto... args) { return (args + ...); };
-        expect(f2() == 10_i);
-        expect(!std::is_empty_v<decltype(f2)>);
-        // TODO: test whether no copies are being made
-        // TODO: test non-default-constructible types
-    };
+    "stateful"_test = stateful_test;
 
     "extra_parameters"_test = [=] {
         auto f1 = compressed_tuple{ empty } >> [](Empty, int) { return 0; };
