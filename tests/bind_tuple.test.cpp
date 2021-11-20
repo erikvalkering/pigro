@@ -72,8 +72,8 @@ suite bind_tuple_tests = [] {
 
     "mutable"_test = [=] {
         auto f = compressed_tuple{ empty } >> [](Empty) mutable { return 0; };
-        expect(f() == 0_i);
-        expect(std::is_empty_v<decltype(f)>);
+        expect(that % f() == 0);
+        expect(that % std::is_empty_v<decltype(f)>);
     };
 
     "sfinae_friendly"_test = [=] {
@@ -90,7 +90,7 @@ suite bind_tuple_tests = [] {
     "zero_args"_test = [] {
         auto f = compressed_tuple{} >> [] { return 0; };
 
-        expect(f() == 0_i);
+        expect(f() == 0);
     };
 
     "remember_state"_test = [=] {
