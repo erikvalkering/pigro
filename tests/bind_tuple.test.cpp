@@ -145,6 +145,13 @@ auto perfect_forward_front_test() {
     expect(inc(std::make_unique<int>(0)) == 1_i);
 }
 
+auto perfect_forward_back_test() {
+    auto sum = [](int a, std::unique_ptr<int> &b) { return a + *b; };
+    auto inc = bind_back(sum, std::make_unique<int>(1));
+
+    expect(inc(0) == 1_i);
+}
+
 auto perfect_forward_callable_test() {
     struct move_only_summer {
         move_only_summer() = default;
@@ -192,12 +199,7 @@ suite bind_back_tests = [] {
 
     "perfect_forward_front"_test = perfect_forward_front_test;
 
-    "perfect_forward_back"_test = [] {
-        auto sum = [](int a, std::unique_ptr<int> &b) { return a + *b; };
-        auto inc = bind_back(sum, std::make_unique<int>(1));
-
-        expect(inc(0) == 1_i);
-    };
+    "perfect_forward_back"_test = perfect_forward_back_test;
 
     "perfect_forward_callable"_test = perfect_forward_callable_test;
 
