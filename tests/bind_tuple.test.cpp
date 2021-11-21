@@ -138,6 +138,13 @@ auto by_value_test() {
     expect_that(inc(0) == 1);
 }
 
+auto perfect_forward_front_test() {
+    auto sum = [](std::unique_ptr<int> a, int b) { return *a + b; };
+    auto inc = bind_back(sum, 1);
+
+    expect(inc(std::make_unique<int>(0)) == 1_i);
+}
+
 auto perfect_forward_callable_test() {
     struct move_only_summer {
         move_only_summer() = default;
@@ -183,12 +190,7 @@ auto sfinae_friendliness_test() {
 suite bind_back_tests = [] {
     "by_value"_test = by_value_test;
 
-    "perfect_forward_front"_test = [] {
-        auto sum = [](std::unique_ptr<int> a, int b) { return *a + b; };
-        auto inc = bind_back(sum, 1);
-
-        expect(inc(std::make_unique<int>(0)) == 1_i);
-    };
+    "perfect_forward_front"_test = perfect_forward_front_test;
 
     "perfect_forward_back"_test = [] {
         auto sum = [](int a, std::unique_ptr<int> &b) { return a + *b; };
