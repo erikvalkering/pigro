@@ -138,6 +138,19 @@ auto by_value_test() {
     expect_that(inc(0) == 1);
 }
 
+auto sfinae_friendliness_test() {
+    auto lift = [](auto f) { return [=](auto... args) { return f(args...); }; };
+
+    auto f = overload{
+        lift([](nullptr_t) { return 1; }),
+        bind_back([](nullptr_t, int) { return 1; }, 0),
+        [](double) { return 2; },
+    };
+
+    expect(f(nullptr) == 1_i);
+    expect(f(1.0) == 2_i);
+}
+
 suite bind_back_tests = [] {
     "by_value"_test = by_value_test;
 
@@ -184,18 +197,7 @@ suite bind_back_tests = [] {
         expect(inc(0) == 1_i);
     };
 
-    "SFINAE-friendliness"_test = [] {
-        auto lift = [](auto f) { return [=](auto... args) { return f(args...); }; };
-
-        auto f = overload{
-            lift([](nullptr_t) { return 1; }),
-            //bind_back([](nullptr_t, int) { return 1; }, 0),
-            [](double) { return 2; },
-        };
-
-        expect(f(nullptr) == 1_i);
-        expect(f(1.0) == 2_i);
-    };
+    "SFINAE-friendliness"_test = sfinae_friendliness_test;
 };
 
 suite bind_back_tuple_tests = [] {
