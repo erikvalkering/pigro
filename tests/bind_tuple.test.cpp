@@ -44,6 +44,29 @@ auto remember_state_test() {
     expect_that(f() == 2);
 }
 
+auto size_test() {
+    auto empty = Empty{};
+
+    auto x = 1;
+
+    auto f1 = compressed_tuple{ empty } >> [](Empty) { return 0; };
+    expect_that(f1() == 0);
+    expect_that(sizeof(f1) == 1);
+    expect_that(std::is_empty_v<decltype(f1)>);
+
+    auto f2 = compressed_tuple{ empty } >> [x](Empty) { return x; };
+    expect_that(f2() == 1);
+    expect_that(sizeof(f2) == sizeof(int));
+
+    auto f3 = compressed_tuple{ x } >> [](int x) { return x; };
+    expect_that(f3() == 1);
+    expect_that(sizeof(f3) == sizeof(int));
+
+    auto f4 = compressed_tuple{ x } >> [y = x](int x) { return x + y; };
+    expect_that(f4() == 2);
+    expect_that(sizeof(f4) == sizeof(int) + sizeof(int));
+}
+
 suite bind_tuple_tests = [] {
     auto empty = Empty{};
 
@@ -104,27 +127,7 @@ suite bind_tuple_tests = [] {
 
     "remember_state"_test = remember_state_test;
 
-
-    "size"_test = [=] {
-        auto x = 1;
-
-        auto f1 = compressed_tuple{ empty } >> [](Empty) { return 0; };
-        expect(f1() == 0_i);
-        expect(sizeof(f1) == 1_i);
-        expect(std::is_empty_v<decltype(f1)>);
-
-        auto f2 = compressed_tuple{ empty } >> [x](Empty) { return x; };
-        expect(f2() == 1_i);
-        expect(sizeof(f2) == sizeof(int));
-
-        auto f3 = compressed_tuple{ x } >> [](int x) { return x; };
-        expect(f3() == 1_i);
-        expect(sizeof(f3) == sizeof(int));
-
-        auto f4 = compressed_tuple{ x } >> [y = x](int x) { return x + y; };
-        expect(f4() == 2_i);
-        expect(sizeof(f4) == sizeof(int) + sizeof(int));
-    };
+    "size"_test = size_test;
 };
 
 suite bind_back_tests = [] {
