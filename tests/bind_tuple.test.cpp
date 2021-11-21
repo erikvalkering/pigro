@@ -146,7 +146,7 @@ auto perfect_forward_front_test() {
 }
 
 auto perfect_forward_back_test() {
-    auto sum = [](int a, std::unique_ptr<int> &b) { return a + *b; };
+    auto sum = [](int a, const std::unique_ptr<int> &b) { return a + *b; };
     auto inc = bind_back(sum, std::make_unique<int>(1));
 
     expect(inc(0) == 1_i);
