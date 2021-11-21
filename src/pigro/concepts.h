@@ -37,7 +37,7 @@ concept tuple_like = requires {
 &&[]<std::size_t... I>(std::index_sequence<I...>) {
     return (has_tuple_element<I, std::remove_reference_t<T>> && ...);
 }
-(std::make_index_sequence<std::tuple_size_v<T>>());
+(std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<T>>>());
 ;
 
 } // namespace pigro::concepts
