@@ -130,13 +130,16 @@ suite bind_tuple_tests = [] {
     "size"_test = size_test;
 };
 
-suite bind_back_tests = [] {
-    "by_value"_test = [] {
-        auto sum = [](int a, int b) { return a + b; };
-        auto inc = bind_back(sum, 1);
+auto sum = [](int a, int b) { return a + b; };
 
-        expect(inc(0) == 1_i);
-    };
+auto by_value_test() {
+    auto inc = bind_back(sum, 1);
+
+    expect_that(inc(0) == 1);
+}
+
+suite bind_back_tests = [] {
+    "by_value"_test = by_value_test;
 
     "perfect_forward_front"_test = [] {
         auto sum = [](std::unique_ptr<int> a, int b) { return *a + b; };
