@@ -130,10 +130,10 @@ suite bind_tuple_tests = [] {
     "size"_test = size_test;
 };
 
-auto sum = [](int a, int b) { return a + b; };
+auto sum2 = [](int a, int b) { return a + b; };
 
 auto by_value_test() {
-    auto inc = bind_back(sum, 1);
+    auto inc = bind_back(sum2, 1);
 
     expect_that(inc(0) == 1);
 }
