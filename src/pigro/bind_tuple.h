@@ -38,7 +38,8 @@ auto bind_back_tuple(auto &&f, concepts::tuple_like auto &&t) {
         overload{
           compressed_tuple_element<0>(FWD(f)),
           compressed_tuple_element<1>(FWD(t)),
-          [](auto &&self, auto &&...args) {
+          [](auto &&self, auto &&...args)
+            -> decltype(pigro::apply(std::bind_front(f, FWD(args)...), t)) {
               auto &&f = self(idx<0>);
               auto &&t = self(idx<1>);
 
