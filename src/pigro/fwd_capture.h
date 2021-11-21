@@ -20,3 +20,5 @@ decltype(auto) access(T &&x) {
 }
 
 } // namespace pigro
+
+#define FWD_CAPTURE(x) fwd_capture(std::forward<decltype(x)>(x))

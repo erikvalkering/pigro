@@ -37,3 +37,5 @@ template<typename From, template<typename...> class To>
 using rebind_container_t = rebind_container<From, To>::type;
 
 } // namespace pigro
+
+#define FWD(x) std::forward<decltype(x)>(x)
