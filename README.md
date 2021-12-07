@@ -22,12 +22,12 @@ Now we can use it as follows:
 auto foobar() {
    // ...
    database().query(...); // slow startup time due to connection
-//... 
-    database().query(...); // fast using cached connection
+   //... 
+   database().query(...); // fast using cached connection
 }
 ```
 
-Features
+# Features
 - [x] easy creation of cached functions 
 - [x] reactivity by specifying dependencies
 - [x] support for values, functions, and lazy functions as dependency
