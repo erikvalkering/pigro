@@ -3,15 +3,14 @@ _Lazy evaluation on steroids_
 
 The Pigro library allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
 
-Let's start out with a simple example. Imagine we have some code that may use some database, but connecting to it is a relatively expensive operation. Therefore, you'd want to postpone the connection to the database until it is absolutely necessary.
+Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
 
-Using the `pigro::lazy` utility, we can very easily create a function that just connects to the database the first time it is called and will reuse the previously created connection any subsequent time it is being called:
+Using the `pigro::lazy` utility, we can very easily create a function that just calls the function the first time it is called and will reuse the previously calculated result any subsequent time it is being called:
 
 ```c++
-auto database = pigro::lazy([] {
-    auto connection_string = ...;
-    return connect_database(connection_string);
-});
+auto long_computation() -> int;
+
+auto lazy_computation = pigro::lazy(long_computation);
 ```
 
 Behind the scenes, it will cache the return value and will return that for any subsequent call.
@@ -19,12 +18,10 @@ Behind the scenes, it will cache the return value and will return that for any s
 Now we can use it as follows:
 
 ```c++
-auto foobar() {
-   // ...
-   database().query(...); // slow startup time due to connection
-   //... 
-   database().query(...); // fast using cached connection
-}
+auto answer_to_life = lazy_computation(); // may take a while...
+assert(answer_to_life == 42);
+// ...
+auto universe_and_everything = lazy_computation(); // instantaneous!
 ```
 
 # Features
