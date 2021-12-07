@@ -74,7 +74,7 @@ while (true) {
 ```
 
 ## Comparison with hand-coded solution
-**Lazy & Reactive**
+**Lazy & Reactive - using `pigro`**
 ```c++
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
