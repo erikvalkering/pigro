@@ -73,6 +73,59 @@ while (true) {
 }
 ```
 
+## Comparison with hand-coded solution
+**Lazy & Reactive**
+```c++
+auto mode = lazy(get_drawing_mode);
+auto filename = lazy(get_mouse_icon_filename, mode);
+auto icon = lazy(load_image, filename);
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+
+// Rendering loop for a graphics editor
+while (true) {
+    mouse_cursor();
+}
+```
+
+**Hand-coded**
+```c++
+auto should_draw_mouse_cursor = false;
+auto cache_pos = std::optional<point_2d>{};
+auto cache_icon = std::optional<image>{};
+auto cache_filename = std::optional<std::string>{};
+auto cache_mode = std::optional<drawing_mode>{};
+
+// Rendering loop for a graphics editor
+while (true) {
+    const auto pos = get_mouse_pos();
+    if (cache_pos != pos) {
+        cache_pos = pos;
+        should_draw_mouse_cursor = true;
+    }
+
+    const auto mode = get_drawing_mode();
+    if (cache_mode != mode) {
+        cache_mode = mode;
+
+        const auto filename = get_mouse_icon_filename(mode);
+        if (cache_filename != filename) {
+            cache_filename = filename;
+
+            const auto icon = load_image(filename);
+            if (cache_icon != icon) {
+                cache_icon = icon;
+
+                should_draw_mouse_cursor = true;
+            }
+        }
+    }
+
+    if (should_draw_mouse_cursor /* && cache_pos && cache_icon */) {
+        draw_mouse_cursor(*cache_pos, *cache_icon);
+    }
+}
+```
+
 # Features
 - [x] easy creation of cached functions 
 - [x] reactivity by specifying dependencies
