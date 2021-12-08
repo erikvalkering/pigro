@@ -9,6 +9,7 @@ The Pigro library allows you to define functions in a declarative and reactive w
 
 |a|b|
 |-|-|
+|```{} ```|```[] ```|
 # Lazy functions
 Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
 
