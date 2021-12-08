@@ -9,7 +9,12 @@ The Pigro library allows you to define functions in a declarative and reactive w
 
 |a|b|
 |-|-|
-|```{} ```|```[] ```|
+|```auto should_draw_mouse_cursor = false;
+auto cache_pos = std::optional<point_2d>{};
+auto cache_icon = std::optional<image>{};
+auto cache_filename = std::optional<std::string>{};
+auto cache_mode = std::optional<drawing_mode>{};
+```|```[] ```|
 # Lazy functions
 Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
 
