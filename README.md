@@ -51,6 +51,9 @@ while (true) {
 }
 ```
 
+In addition to being shorter, this is actually also more efficient. This is because `load_image()` is loaded only once, whereas previously it would be continuously called.
+
+
 ## Reactivity all the way down
 ```c++
 auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
