@@ -134,9 +134,10 @@ while (true) {
 # Features
 - [x] easy creation of cached functions 
 - [x] reactivity by specifying dependencies
-- [x] support for values, functions, and lazy functions as dependency
+- [x] support for values, functions, and lazy functions as dependencies
 - [x] skipping re-evaluation if dependencies evaluate to same values as previous ones
 - [x] skipping comparison of lazy function dependencies if they were not re-evaluated
+- [x] memory optimization for void functions
 - [ ] memory optimization for stateless dependencies
 - [ ] memory optimization for dependencies (only store cached result and any stateful transitive dependencies
 
