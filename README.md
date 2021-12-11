@@ -28,7 +28,29 @@ assert(answer_to_life == 42);
 auto universe_and_everything = lazy_computation(); // instantaneous!
 ```
 
-# Reactive functions
+# Dependencies
+```
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+
+// Rendering loop for a graphics editor
+while (true) {
+    draw_mouse_cursor(get_mouse_pos(), load_image("arrow.png"));
+}
+```
+
+```
+// Rendering loop for a graphics editor
+
+while (true) {
+
+    mouse_cursor();
+
+}
+```
+
 ```c++
 auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
