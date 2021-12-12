@@ -33,7 +33,9 @@ if (bar) {
 // etc.
 ```
 
-Apart from the boilerplate, this ties an implicit relationship between the `initialize()` function and the `is_initialized` variable. It would be better to combine them into a single entity. This is where the `pigro::lazy()` function comes in. It can be used to wrap an existing function, and make sure that any subsequent time that it is called, nothing will happen:
+Apart from the boilerplate, this ties an **implicit** relationship between the `initialize()` function and the `is_initialized` flag. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. This in turn will have a negative impact on the maintainability of the code.
+
+Instead, it would be better to combine the function and the flag into a single entity. This is where the `pigro::lazy()` function comes in. Using it will wrap an existing function, and make sure that any subsequent call will be ignored:
 ```c++
 auto ensure_initialized = pigro::lazy(initialize);
 
@@ -53,7 +55,7 @@ if (bar) {
 ```
 > Ignore the fact that there is still an implicit ordering dependency between the calls to `use_***_resource()` and `ensure_initialized()`, which is just bad design but which is not the point of this example.
 
-The resulting code is much cleaner: there is less boilerplate, and more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function. The latter would become even more beneficial if you would have several functions that need to be called at most once, in which case you'd need multiple of those flags, which could very easily lead to maintainability problems.
+The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function.
 
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
 ```c++
