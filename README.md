@@ -1,11 +1,75 @@
 # pigro
 _Lazy evaluation on steroids_
 
-The Pigro library allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
-
-
+Pigro is a C++20 library that allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
 
 # Lazy functions
+Let's start out with the simplest use case: we want to make sure that some function is called only once. Imagine we have several functions that use some global resources and a single `initialize()` function that initializes those resources. Before calling those functions, we must make sure that the `initialize()` function has been called. Furthermore, this should be done at most once. A typical solution is to keep track of whether the `initialize()` function was called already, using a boolean flag:
+
+```c++
+auto initialize() -> void;
+auto is_initialized = false;
+
+// ...at some point
+if (foo) {
+    if (!is_initialized) {
+        initialize();
+        is_initialized = true;
+    }
+
+    use_some_global_resource();
+}
+
+// ...elsewhere
+if (bar) {
+    if (!is_initialized) {
+        initialize();
+        is_initialized = true;
+    }
+
+    use_another_global_resource();
+}
+
+// etc.
+```
+
+Apart from the boilerplate, this ties an implicit relationship between the `initialize()` function and the `is_initialized` variable. It would be better to combine them into a single entity. This is where the `pigro::lazy()` function comes in. It can be used to wrap an existing function, and make sure that any subsequent time that it is called, nothing will happen:
+```c++
+auto ensure_initialized = pigro::lazy(initialize);
+
+// ...at some point
+if (foo) {
+    ensure_initialized();
+    use_some_global_resource();
+}
+
+// ...elsewhere
+if (bar) {
+    ensure_initialized();
+    use_another_global_resource();
+}
+
+// etc.
+```
+> Ignore the fact that there is still an implicit ordering dependency between the calls to `use_***_resource()` and `ensure_initialized()`, which is just bad design but which is not the point of this example.
+
+The resulting code is much cleaner: there is less boilerplate, and more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function. The latter would become even more beneficial if you would have several functions that need to be called at most once, in which case you'd need multiple of those flags, which could very easily lead to maintainability problems.
+
+In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
+```c++
+auto lazy(std::invocable auto f) {
+    return [is_called = false]() mutable {
+        if (is_called) return;
+        
+        f();
+        is_called = true;
+    };
+}
+```
+
+So as was expected, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false`.
+
+# Cache
 Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
 
 Using the `pigro::lazy` utility, we can very easily create a function that just calls the function the first time it is called and will reuse the previously calculated result any subsequent time it is being called:
@@ -29,11 +93,10 @@ auto universe_and_everything = lazy_computation(); // instantaneous!
 ```
 
 # Dependencies
-```
+```c++
 auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
-
 
 // Rendering loop for a graphics editor
 while (true) {
