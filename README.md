@@ -142,4 +142,4 @@ while (true) {
 - [ ] memory optimization for dependencies (only store cached result and any stateful transitive dependencies
 
 # Presentations
-- [LEVEL UP 2021 Rome Developer Conference](https://levelup.aiv01.it/EN/2021/84/Erik_Valkerin/888) [presentation](https://github.com/erikvalkering/pigro_presentation_levelup2021/releases/download/v1/presentation.pdf)
+- [LEVEL UP 2021 Rome Developer Conference](https://levelup.aiv01.it/EN/2021/84/Erik_Valkerin/888) ([presentation](https://github.com/erikvalkering/pigro_presentation_levelup2021/releases/download/v1/presentation.pdf))
