@@ -144,9 +144,9 @@ while (true) {
 Now, when the lazy `mouse_cursor()` function is being called, it will first check whether any dependency has changed, and if so, only then it will call the actual wrapped function. As a result, the `render_mouse_cursor()` function will _only_ be called if the mouse was in fact moved (i.e. if `get_mouse_pos()` returned a different value). A look behind the scenes might give away the magic that is going on (again **heavily simplified**):
 
 ```c++
-auto lazy(auto f, auto ...deps) {
+auto lazy(auto f, auto ...dependencies) {
     auto cache = std::optional<decltype(f())>{};
-    auto dependencies_cache = std::optional<decltype(std::tuple{deps()})>{};
+    auto dependencies_cache = std::optional<decltype(std::tuple{dependencies()})>{};
 
     return [=]() mutable {
         const auto args = std::tuple{dependencies()...};
@@ -167,7 +167,6 @@ Although this is slightly more complex than the previous version, it opens up ni
 A keen eye may have noticed that there is some redundant work being done. Each time that the mouse is being moved, we render the mouse cursor. However, we are also loading the arrow image again and again, even though this image might not change.
 
 Which the current functionality, this issue is easily fixed:
-
 ```c++
 // ...
 auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
@@ -183,13 +182,55 @@ Because the previous pattern occurs quite often, i.e. having a constant-valued d
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
 ```
 
-They will automatically 
-In addition to being shorter, this is actually also more efficient. This is because `load_image()` is loaded only once, whereas previously it would be continuously called.
+This will wrap the image dependency with a lazy function, such that the value will be cached and used inside of the `render_mouse_cursor()` function, instead of loading the images every time.
 
-As a result of this, the following is a shorter way to define the `mouse_cursor()` lazy function, while at the same time being nearly as efficient (:
+In order to make this work, we actually don't need to modify the implementation of the existing `pigro::lazy()` utility, but merely constrain it a bit and add a new overload:
 ```c++
-auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+auto lazy(auto f, std::invocable auto ...dependencies) {
+    // ...as before...
+}
+
+auto ensure_invocable(std::invocable auto dependency) {
+     return dependency;
+}
+
+auto ensure_invocable(auto dependency) {
+    return lazy([=] { return dependency; });
+}
+
+auto lazy(auto f, auto ...dependencies) {
+    return lazy(f, ensure_invocable(dependencies...));
+}
 ```
+
+The first `lazy`-overload is the previous `lazy()` implementation, but now constrained using `std::invocable`, such that it will only be selected if all of the dependencies can be called. The second `lazy`-overload will be selected otherwise, and simply transforms each dependency into a form that can be invoked as a function, and then delegates to the first overload. The two `ensure_invocable()` overloads are helpers that perform this transformation. The first will be selected for dependencies that are already callable, and therefore returns them as-is. The second one creates a function that returns the dependency and subsequently wraps it with `lazy()` to make sure that it will be called only once (and therefore the cache will be used).
+
+## Extra laziness
+One drawback of passing the image as a value dependency, is that it will be evaluated, even in the case that it might never be called. For example, it the following case this would unnecessarily load resources from disk:
+```c++
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+
+auto is_mouse_hidden = ...;
+
+// Rendering loop for a graphical editor
+while (true) {
+    if (!is_mouse_hidden) {
+        mouse_cursor();
+    }
+}
+```
+
+This can now also be fixed quite easily, by making the arrow fully lazy:
+```c++
+auto arrow = pigro::lazy(load_image, "arrow.png");
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
+```
+
+Now, the image won't even be loaded until when it is actually needed. Afterwards, the previously cached value will be used.
 
 ## Reactivity all the way down
 ```c++
