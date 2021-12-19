@@ -72,15 +72,20 @@ auto lazy(auto f) {
 
 So as was expected, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false` and subsequently sets the flag to `true`.
 
-# Cache
-Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
+# Caching
+In the previous example we wrapped a function without any return value, simply to ensure it is called only once. However, in many cases functions actually return something useful. Consider for example a function that performs a relatively expensive calculation. In that case, you'd want to postpone calling this function until the very moment that you need this value.
 
-Using the `pigro::lazy` utility, we can very easily create a function that just calls the function the first time it is called and will reuse the previously calculated result any subsequent time it is being called:
+In order to support this use case, the `pigro::lazy()` utility will cache the returned value for functions that do not return `void`. Any subsequent time that the function is called, it simply returns the previously-cached value:
 
 ```c++
-auto long_computation() -> int;
+auto deep_thought() {
+    // simulate some very expensive calculation
+    this_thread::sleep(7'500'000y);
+    
+    return 42;
+}
 
-auto lazy_computation = pigro::lazy(long_computation);
+auto lazy_deep_thought = pigro::lazy(deep_thought);
 ```
 
 Behind the scenes, it will cache the return value and will return that for any subsequent call.
@@ -88,11 +93,12 @@ Behind the scenes, it will cache the return value and will return that for any s
 Now we can use it as follows:
 
 ```c++
-auto answer_to_life = lazy_computation(); // may take a while...
+auto answer_to_life = lazy_deep_thought(); // may take a while...
 assert(answer_to_life == 42);
 
 // ...
-auto universe_and_everything = lazy_computation(); // instantaneous!
+auto universe_and_everything = lazy_deep_thought(); // instantaneous!
+assert(universe_and_everything == 42);
 ```
 
 # Dependencies
