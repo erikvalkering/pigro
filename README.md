@@ -86,22 +86,31 @@ auto deep_thought() {
 }
 
 auto lazy_deep_thought = pigro::lazy(deep_thought);
-```
 
-Behind the scenes, it will cache the return value and will return that for any subsequent call.
-
-Now we can use it as follows:
-
-```c++
 auto answer_to_life = lazy_deep_thought(); // may take a while...
 assert(answer_to_life == 42);
 
-// ...
 auto universe_and_everything = lazy_deep_thought(); // instantaneous!
 assert(universe_and_everything == 42);
 ```
 
+As before, a **heavily simplified** version of the `pigro::lazy()` function might give a better understand of what is going on behind the scenes:
+```c++
+auto lazy(auto f) {
+    auto cache = std::optional<decltype(f())>{};
+
+    return [=]() mutable {
+        if (cache) return *cache;
+        
+        cache = f();
+        return *cache;
+    };
+}
+```
+
 # Dependencies
+In the previous two examples, the main use case was to ensure that the function is called at most once. However, there may be cases in which you'd want to somehow "invalidate" the cache or the `is_called` flag.
+
 ```c++
 auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
