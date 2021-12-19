@@ -1,64 +1,240 @@
-# pigro
+# Pigro
 _Lazy evaluation on steroids_
 
-The Pigro library allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
-
-
+Pigro is a C++20 library that allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
 
 # Lazy functions
-Let's start out with a simple example. Imagine we have some function that performs a relatively expensive operation. Therefore, you'd want to postpone calling this function  until it is absolutely necessary.
-
-Using the `pigro::lazy` utility, we can very easily create a function that just calls the function the first time it is called and will reuse the previously calculated result any subsequent time it is being called:
+Let's start out with the simplest use case: we want to make sure that some function is called only once. Imagine we have several functions that use some global resources and a single `initialize()` function that initializes those resources. Before calling those functions, we must make sure that the `initialize()` function has been called. Furthermore, this should be done at most once. A typical solution is to keep track of whether the `initialize()` function was called already, using a boolean flag:
 
 ```c++
-auto long_computation() -> int;
+auto initialize() -> void;
+auto is_initialized = false;
 
-auto lazy_computation = pigro::lazy(long_computation);
+// ...at some point
+if (foo) {
+    if (!is_initialized) {
+        initialize();
+        is_initialized = true;
+    }
+
+    use_some_global_resource();
+}
+
+// ...elsewhere
+if (bar) {
+    if (!is_initialized) {
+        initialize();
+        is_initialized = true;
+    }
+
+    use_another_global_resource();
+}
+
+// etc.
 ```
 
-Behind the scenes, it will cache the return value and will return that for any subsequent call.
+Apart from the boilerplate, this ties an **implicit** relationship between the `initialize()` function and the `is_initialized` flag. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. This in turn will have a negative impact on the maintainability of the code.
 
-Now we can use it as follows:
+Instead, it would be better to combine the function and the flag into a single entity. This is where the `pigro::lazy()` function comes in. Using it will wrap an existing function, and make sure that any subsequent call will be ignored:
+```c++
+auto ensure_initialized = pigro::lazy(initialize);
+
+// ...at some point
+if (foo) {
+    ensure_initialized();
+    use_some_global_resource();
+}
+
+// ...elsewhere
+if (bar) {
+    ensure_initialized();
+    use_another_global_resource();
+}
+
+// etc.
+```
+> Ignore the fact that there is still an implicit ordering dependency between the calls to `use_***_resource()` and `ensure_initialized()`, which is just bad design but which is not the point of this example.
+
+The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function.
+
+In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
+```c++
+auto lazy(auto f) {
+    auto is_called = false;
+    return [=]() mutable {
+        if (is_called) return;
+        
+        f();
+        is_called = true;
+    };
+}
+```
+
+As can be seen, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false` and subsequently sets the flag to `true`.
+
+# Caching
+In the previous example we wrapped a function that did not return any value. Often, however, functions do return something useful. Consider for example a function that performs a relatively expensive calculation but also returns the result from that calculation. In order to support this use case, the `pigro::lazy()` utility will cache any value returned by the wrapped function. Any subsequent time that the function is called, it simply returns the previously-cached value:
 
 ```c++
-auto answer_to_life = lazy_computation(); // may take a while...
+auto deep_thought() {
+    // simulate some very expensive calculation
+    this_thread::sleep(7500000y);
+    
+    return 42;
+}
+
+auto lazy_deep_thought = pigro::lazy(deep_thought);
+
+auto answer_to_life = lazy_deep_thought(); // may take a while...
 assert(answer_to_life == 42);
 
-// ...
-auto universe_and_everything = lazy_computation(); // instantaneous!
+auto universe_and_everything = lazy_deep_thought(); // instantaneous!
+assert(universe_and_everything == 42);
 ```
 
-# Reactive functions
+As before, a **heavily simplified** version of the `pigro::lazy()` function might give a better understand of what is going on behind the scenes:
 ```c++
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto lazy(auto f) {
+    auto cache = std::optional<decltype(f())>{};
+
+    return [=]() mutable {
+        if (!cache)
+            cache = f();
+
+        return *cache;
+    };
+}
+```
+
+Basically, the only change we made in order to support caching, was to change the `bool` flag to an `std::optional`, which holds both the cached value and the flag.
+
+# Dependencies
+In the previous two examples, the main use case for both was to ensure that the wrapped function is called at most once. However, in some cases an event might require that the wrapped function to be called again. Consider for example a graphical editor, with a rendering loop, in which we need to render a mouse cursor:
+
+```c++
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+// Rendering loop for a graphical editor
+while (true) {
+    render_mouse_cursor(get_mouse_pos(), load_image("arrow.png"));
+}
+```
+
+As an optimization, we might want to skip the render call if the mouse was not moved. Unfortunately, simply wrapping the render call inside of `pigro::lazy()` won't help here, because that will render the mouse cursor **only** once, instead of only when the mouse is being moved. We'd somehow need to "invalidate" the cache or the `is_called` flag in case the mouse was moved.
+
+Fortunately, the `pigro::lazy()` utility also has this use case covered, and this is actually where the Pigro library shines: Reactive Programming.
+
+In addition to passing the render function, `pigro::lazy()` accepts additional _dependencies_ - _functions_ which are supposed to provide the inputs to the wrapped function:
+```c++
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 
 auto arrow = [] { return load_image("arrow.png"); };
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
 ```
 
-As a short-hand, we can also pass values directly as dependencies to the lazy function:
+Now, when the lazy `mouse_cursor()` function is being called, it will first check whether any dependency has changed, and if so, only then it will call the actual wrapped function. As a result, the `render_mouse_cursor()` function will _only_ be called if the mouse was in fact moved (i.e. if `get_mouse_pos()` returned a different value). A look behind the scenes might give away the magic that is going on (again **heavily simplified**):
+
 ```c++
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+auto lazy(auto f, auto ...dependencies) {
+    auto cache = std::optional<decltype(f())>{};
+    auto dependencies_cache = std::optional<decltype(std::tuple{dependencies()})>{};
 
-// Rendering loop for a graphics editor
-while (true) {
-    mouse_cursor();
+    return [=]() mutable {
+        const auto args = std::tuple{dependencies()...};
+        if (!cache || args != dependencies_cache) {
+            cache = std::apply(f, args);
+            dependencies_cache = args;
+        }
+
+        return *cache;
+    };
 }
 ```
 
-In addition to being shorter, this is actually also more efficient. This is because `load_image()` is loaded only once, whereas previously it would be continuously called.
+This new version of the `pigro::lazy()` utility keeps track of two caches: one for the wrapped function, and another that bundles all of the return values from the dependencies. Now, in order to determine whether we should call our wrapped function, we simply check whether the function cache was previously filled, or whether any of the dependencies have changed, by comparing them against this second _dependencies_ cache.
 
+Although this is slightly more complex than the previous version, it opens up nice new possibilities.
+
+A keen eye may have noticed that there is some redundant work being done. Each time that the mouse is being moved, we render the mouse cursor. However, we are also loading the arrow image again and again, even though this image might not change.
+
+Which the current functionality, this issue is easily fixed:
+```c++
+// ...
+auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
+// ...
+```
+
+Now, the `arrow()` function can be used as dependency for the `render_mouse_cursor()` function, while at the same time being optimized to be called only once.
+
+# Syntax sugar
+Because the previous pattern occurs quite often, i.e. having a constant-valued dependency that should be cached, there is a short-hand syntax available such that we can pass values directly as dependencies to the `pigro::lazy()` utility:
+```c++
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+```
+
+This will wrap the image dependency with a lazy function, such that the value will be cached and used inside of the `render_mouse_cursor()` function, instead of loading the images every time.
+
+In order to make this work, we actually don't need to modify the implementation of the existing `pigro::lazy()` utility, but merely constrain it a bit and add a new overload:
+```c++
+auto lazy(auto f, std::invocable auto ...dependencies) {
+    // ...as before...
+}
+
+auto ensure_invocable(std::invocable auto dependency) {
+     return dependency;
+}
+
+auto ensure_invocable(auto dependency) {
+    return lazy([=] { return dependency; });
+}
+
+auto lazy(auto f, auto ...dependencies) {
+    return lazy(f, ensure_invocable(dependencies...));
+}
+```
+
+The first `lazy`-overload is the previous `lazy()` implementation, but now constrained using `std::invocable`, such that it will only be selected if all of the dependencies can be called. The second `lazy`-overload will be selected otherwise, and simply transforms each dependency into a form that can be invoked as a function, and then delegates to the first overload. The two `ensure_invocable()` overloads are helpers that perform this transformation. The first will be selected for dependencies that are already callable, and therefore returns them as-is. The second one creates a function that returns the dependency and subsequently wraps it with `lazy()` to make sure that it will be called only once (and therefore the cache will be used).
+
+## Extra laziness
+One drawback of passing the image as a value dependency, is that it will be evaluated, even in the case that it might never be called. For example, it the following case this would unnecessarily load resources from disk:
+```c++
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+
+auto is_mouse_hidden = ...;
+
+// Rendering loop for a graphical editor
+while (true) {
+    if (!is_mouse_hidden) {
+        mouse_cursor();
+    }
+}
+```
+
+This can now also be fixed quite easily, by making the arrow fully lazy:
+```c++
+auto arrow = pigro::lazy(load_image, "arrow.png");
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
+```
+
+Now, the image won't even be loaded until when it is actually needed. Afterwards, the previously cached value will be used.
 
 ## Reactivity all the way down
 ```c++
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 auto get_drawing_mode() -> drawing_mode;
@@ -70,9 +246,9 @@ auto get_mouse_icon_filename(const drawing_mode mode) {
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
 auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -84,9 +260,9 @@ while (true) {
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
 auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -94,18 +270,18 @@ while (true) {
 
 **Hand-coded**
 ```c++
-auto should_draw_mouse_cursor = false;
+auto should_render_mouse_cursor = false;
 auto cache_pos = std::optional<point_2d>{};
 auto cache_icon = std::optional<image>{};
 auto cache_filename = std::optional<std::string>{};
 auto cache_mode = std::optional<drawing_mode>{};
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     const auto pos = get_mouse_pos();
     if (cache_pos != pos) {
         cache_pos = pos;
-        should_draw_mouse_cursor = true;
+        should_render_mouse_cursor = true;
     }
 
     const auto mode = get_drawing_mode();
@@ -120,13 +296,13 @@ while (true) {
             if (cache_icon != icon) {
                 cache_icon = icon;
 
-                should_draw_mouse_cursor = true;
+                should_render_mouse_cursor = true;
             }
         }
     }
 
-    if (should_draw_mouse_cursor /* && cache_pos && cache_icon */) {
-        draw_mouse_cursor(*cache_pos, *cache_icon);
+    if (should_render_mouse_cursor /* && cache_pos && cache_icon */) {
+        render_mouse_cursor(*cache_pos, *cache_icon);
     }
 }
 ```
