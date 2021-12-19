@@ -170,7 +170,7 @@ Which the current functionality, this issue is easily fixed:
 
 ```c++
 // ...
-auto arrow = pigro::lazy(load_image, [] { return "arrow.png"; });
+auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 // ...
 ```
@@ -178,19 +178,18 @@ auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 Now, the `arrow()` function can be used as dependency for the `render_mouse_cursor()` function, while at the same time being optimized to be called only once.
 
 # Syntax sugar
-
-
-As a short-hand, we can also pass values directly as dependencies to the lazy function:
+Because the previous pattern occurs quite often, i.e. having a constant-valued dependency that should be cached, there is a short-hand syntax available such that we can pass values directly as dependencies to the `pigro::lazy()` utility:
 ```c++
-auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
-
-// Rendering loop for a graphical editor
-while (true) {
-    mouse_cursor();
-}
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
 ```
 
+They will automatically 
 In addition to being shorter, this is actually also more efficient. This is because `load_image()` is loaded only once, whereas previously it would be continuously called.
+
+As a result of this, the following is a shorter way to define the `mouse_cursor()` lazy function, while at the same time being nearly as efficient (:
+```c++
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+```
 
 ## Reactivity all the way down
 ```c++
