@@ -80,7 +80,7 @@ In order to support this use case, the `pigro::lazy()` utility will cache the re
 ```c++
 auto deep_thought() {
     // simulate some very expensive calculation
-    this_thread::sleep(7'500'000y);
+    this_thread::sleep(7500000y);
     
     return 42;
 }
