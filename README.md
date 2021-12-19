@@ -133,7 +133,7 @@ auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 
 auto arrow = [] { return load_image("arrow.png"); };
-auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, arrow);
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 
 // Rendering loop for a graphical editor
 while (true) {
@@ -164,7 +164,21 @@ This new version of the `pigro::lazy()` utility keeps track of two caches: one f
 
 Although this is slightly more complex than the previous version, it opens up nice new possibilities.
 
-A keen eye may have noticed that 
+A keen eye may have noticed that there is some redundant work being done. Each time that the mouse is being moved, we render the mouse cursor. However, we are also loading the arrow image again and again, even though this image might not change.
+
+Which the current functionality, this issue is easily fixed:
+
+```c++
+// ...
+auto arrow = pigro::lazy(load_image, [] { return "arrow.png"; });
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
+// ...
+```
+
+Now, the `arrow()` function can be used as dependency for the `render_mouse_cursor()` function, while at the same time being optimized to be called only once.
+
+# Syntax sugar
+
 
 As a short-hand, we can also pass values directly as dependencies to the lazy function:
 ```c++
