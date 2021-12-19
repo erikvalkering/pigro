@@ -109,38 +109,46 @@ auto lazy(auto f) {
 Basically, the only change we made in order to support caching, was to change the `bool` flag to an `std::optional`, which holds both the cached value and the flag.
 
 # Dependencies
-In the previous two examples, the main use case was to ensure that the function is called at most once. However, there may be cases in which you'd want to somehow "invalidate" the cache or the `is_called` flag.
+In the previous two examples, the main use case for both was to ensure that the wrapped function is called at most once. However, in some cases the wrapped function actually depends on some external state and should also be called when that state changes. Consider for example a graphical editor, with a rendering loop, in which we need to render the mouse cursor.
 
 ```c++
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
-    draw_mouse_cursor(get_mouse_pos(), load_image("arrow.png"));
+    render_mouse_cursor(get_mouse_pos(), load_image("arrow.png"));
 }
 ```
 
-```
-// Rendering loop for a graphics editor
+As an optimization, we don't want to re-render the mouse cursor if the mouse was not moved. Unfortunately, simply wrapping the render call inside of `pigro::lazy()` won't be sufficient, because that will render the mouse cursor **only** once, but not the next time that the mouse is being moved. We'd somehow need to "invalidate" the cache or the `is_called` flag in case the mouse was moved.
 
-while (true) {
+Fortunately, `pigro::lazy()` utility also has this use case covered, and this is actually where the Pigro library shines: reactive programming.
 
-    mouse_cursor();
-
-}
-```
+Instead of merely wrapping the render function, you give an additional argument to the `pigro::lazy()` function that acts as a dependency to the wrapped function:
 
 ```c++
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+// Rendering loop for a graphical editor
+while (true) {
+    render_mouse_cursor(get_mouse_pos(), load_image("arrow.png"));
+}
+```
+
+
+```c++
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 
 auto arrow = [] { return load_image("arrow.png"); };
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, arrow);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -148,9 +156,9 @@ while (true) {
 
 As a short-hand, we can also pass values directly as dependencies to the lazy function:
 ```c++
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -158,10 +166,9 @@ while (true) {
 
 In addition to being shorter, this is actually also more efficient. This is because `load_image()` is loaded only once, whereas previously it would be continuously called.
 
-
 ## Reactivity all the way down
 ```c++
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 auto get_drawing_mode() -> drawing_mode;
@@ -173,9 +180,9 @@ auto get_mouse_icon_filename(const drawing_mode mode) {
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
 auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -187,9 +194,9 @@ while (true) {
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
 auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
 }
@@ -197,18 +204,18 @@ while (true) {
 
 **Hand-coded**
 ```c++
-auto should_draw_mouse_cursor = false;
+auto should_render_mouse_cursor = false;
 auto cache_pos = std::optional<point_2d>{};
 auto cache_icon = std::optional<image>{};
 auto cache_filename = std::optional<std::string>{};
 auto cache_mode = std::optional<drawing_mode>{};
 
-// Rendering loop for a graphics editor
+// Rendering loop for a graphical editor
 while (true) {
     const auto pos = get_mouse_pos();
     if (cache_pos != pos) {
         cache_pos = pos;
-        should_draw_mouse_cursor = true;
+        should_render_mouse_cursor = true;
     }
 
     const auto mode = get_drawing_mode();
@@ -223,13 +230,13 @@ while (true) {
             if (cache_icon != icon) {
                 cache_icon = icon;
 
-                should_draw_mouse_cursor = true;
+                should_render_mouse_cursor = true;
             }
         }
     }
 
-    if (should_draw_mouse_cursor /* && cache_pos && cache_icon */) {
-        draw_mouse_cursor(*cache_pos, *cache_icon);
+    if (should_render_mouse_cursor /* && cache_pos && cache_icon */) {
+        render_mouse_cursor(*cache_pos, *cache_icon);
     }
 }
 ```
