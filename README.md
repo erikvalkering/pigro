@@ -60,7 +60,8 @@ The resulting code is much cleaner: there is less boilerplate, but more importan
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
 ```c++
 auto lazy(auto f) {
-    return [is_called = false]() mutable {
+    auto is_called = false;
+    return [=]() mutable {
         if (is_called) return;
         
         f();
