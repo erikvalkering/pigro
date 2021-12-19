@@ -73,9 +73,7 @@ auto lazy(auto f) {
 So as was expected, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false` and subsequently sets the flag to `true`.
 
 # Caching
-In the previous example we wrapped a function without any return value, simply to ensure it is called only once. However, in many cases functions actually return something useful. Consider for example a function that performs a relatively expensive calculation. In that case, you'd want to postpone calling this function until the very moment that you need this value.
-
-In order to support this use case, the `pigro::lazy()` utility will cache the returned value for functions that do not return `void`. Any subsequent time that the function is called, it simply returns the previously-cached value:
+In the previous example we wrapped a function that did not return any value. However, in many cases functions actually return something useful. Consider for example a function that performs a relatively expensive calculation but also returns the result of that calculation. In order to support this use case, the `pigro::lazy()` utility will cache the returned value for functions that do not return `void`. Any subsequent time that the function is called, it simply returns the previously-cached value:
 
 ```c++
 auto deep_thought() {
