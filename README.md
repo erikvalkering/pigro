@@ -4,7 +4,7 @@ _Lazy evaluation on steroids_
 Pigro is a C++20 library that allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
 
 # Lazy functions
-Let's start out with the simplest use case: we want to make sure that some function is called only once. Imagine we have several functions that use some global resources (e.g. an OpenGL rendering system) and a function that initializes those resources (e.g. `initialize_opengl()`). Before calling those functions that use the global resources, we must make sure that the `initialize_opengl()` function has been called. Furthermore, this should be done at most once, because otherwise it would reset the entire rendering system, canceling all the rendering work that has been performed so far. A typical solution is to keep track of whether the `initialize_opengl()` function was called already, using a boolean flag:
+Let's start out with the simplest use case: we want to make sure that some function is called at most once. Imagine we have several functions that use some global resources (e.g. an OpenGL rendering system) and a function that initializes those resources (e.g. `initialize_opengl()`). Before calling those functions that use the global resources, we must make sure that the `initialize_opengl()` function has been called. Furthermore, this should be done at most once, because otherwise it would reset the entire rendering system, canceling all the rendering work that has been performed so far. A typical solution is to keep track of whether the `initialize_opengl()` function was called already, using a boolean flag:
 
 ```c++
 auto initialize_opengl() -> void;
