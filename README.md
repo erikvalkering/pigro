@@ -122,7 +122,7 @@ auto lazy(auto f) {
 }
 ```
 
-As can be seen, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false` and subsequently sets the flag to `true`.
+As can be seen, `lazy()` simply returns a new function that wraps `f()` and keeps track of the flag `is_called` and only calls `f()` when this flag is `false` and subsequently sets the flag to `true` such that the next time the lazy function is called, it will no longer call `f()`.
 
 # Caching
 In the previous example we wrapped a function that did not return any value. Often, however, functions do return something useful. Consider for example a function that performs a relatively expensive calculation but also returns the result from that calculation. In order to support this use case, the `pigro::lazy()` utility will cache any value returned by the wrapped function. Any subsequent time that the function is called, it simply returns the previously-cached value:
