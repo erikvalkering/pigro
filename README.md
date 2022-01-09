@@ -1,61 +1,117 @@
 # Pigro
 _Lazy evaluation on steroids_
 
+# TL;DR
 Pigro is a C++20 library that allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
 
+Handwritten                          |        Using `pigro::lazy()`
+:-----------------------------------:|:------------------------------------:
+![](docs/comparison-handwritten.png) | ![](docs/comparison-using-pigro.png)
+
 # Lazy functions
-Let's start out with the simplest use case: we want to make sure that some function is called only once. Imagine we have several functions that use some global resources and a single `initialize()` function that initializes those resources. Before calling those functions, we must make sure that the `initialize()` function has been called. Furthermore, this should be done at most once. A typical solution is to keep track of whether the `initialize()` function was called already, using a boolean flag:
+Let's start out with the simplest use case: we want to make sure that some function is called at most once. Imagine we have several functions that use some global resources (e.g. an OpenGL rendering system) and a function that initializes those resources (e.g. `initialize_opengl()`). Before calling those functions that use the global resources, we must make sure that the `initialize_opengl()` function has been called. Furthermore, this should be done at most once, because otherwise it would reset the entire rendering system, undoing all of the rendering work that has been performed so far. Now also assume that for some reason we want to postpone this initialization as long as possible, because it might for example be a very heavy operation, and our application may not always need to use the rendering system. Therefore, simply calling `initialize_opengl()` on startup wouldn't be sufficient.
+
+A typical solution would be to keep track of whether the `initialize_opengl()` function was called already, using a boolean flag, and only call it when this flag is set to `false`:
 
 ```c++
-auto initialize() -> void;
+auto initialize_opengl() -> void;
 auto is_initialized = false;
 
 // ...at some point
-if (foo) {
+if (should_draw_something) {
     if (!is_initialized) {
-        initialize();
+        initialize_opengl();
         is_initialized = true;
     }
 
-    use_some_global_resource();
+    draw_something();
 }
 
 // ...elsewhere
-if (bar) {
+if (should_draw_something_else) {
     if (!is_initialized) {
-        initialize();
+        initialize_opengl();
         is_initialized = true;
     }
 
-    use_another_global_resource();
+    draw_something_else();
 }
 
 // etc.
 ```
 
-Apart from the boilerplate, this ties an **implicit** relationship between the `initialize()` function and the `is_initialized` flag. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. This in turn will have a negative impact on the maintainability of the code.
+Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and cannot be compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly (e.g. by a call to `initialize_opencl()`):
 
-Instead, it would be better to combine the function and the flag into a single entity. This is where the `pigro::lazy()` function comes in. Using it will wrap an existing function, and make sure that any subsequent call will be ignored:
 ```c++
-auto ensure_initialized = pigro::lazy(initialize);
+auto initialize_opengl() -> void;
+auto initialize_opencl() -> void;
+auto is_initialized_opengl = false;
+auto is_initialized_opencl = false;
 
 // ...at some point
-if (foo) {
-    ensure_initialized();
-    use_some_global_resource();
+if (should_draw_something) {
+    if (!is_initialized_opengl) {
+        initialize_opengl();
+        is_initialized_opengl = true;
+    }
+
+    if (!is_initialized_opencl) {
+        initialize_opencl();
+        is_initialized_opencl = true;
+    }
+
+    const auto something = compute_something();
+    draw(something);
 }
 
 // ...elsewhere
-if (bar) {
-    ensure_initialized();
-    use_another_global_resource();
+if (should_draw_something_else) {
+    if (!is_initialized_opengl) {
+        initialize_opengl();
+        is_initialized_opengl = true;
+    }
+
+    if (!is_initialized_opencl) {
+        initialize_opencl();
+        is_initialized_opengl = true;
+    }
+
+    const auto something_else = compute_something_else();
+    draw(something_else);
 }
 
 // etc.
 ```
-> Ignore the fact that there is still an implicit ordering dependency between the calls to `use_***_resource()` and `ensure_initialized()`, which is just bad design but which is not the point of this example.
 
-The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function.
+As can be seen, code written in this way has a negative impact on the maintainability of it (in fact, there is a bug in the code).
+
+Instead, it would be better to combine each initialization function and its corresponding flag into a single entity. This is where the `pigro::lazy()` function comes into play. Using it will wrap an existing function, and make sure that it will be called at most once:
+```c++
+auto ensure_initialized_opengl = pigro::lazy(initialize_opengl);
+auto ensure_initialized_opencl = pigro::lazy(initialize_opencl);
+
+// ...at some point
+if (should_draw_something) {
+    ensure_initialized_opengl();
+    ensure_initialized_opencl();
+    
+    const auto something = compute_something();
+    draw(something);
+}
+
+// ...elsewhere
+if (should_draw_something_else) {
+    ensure_initialized_opengl();
+    ensure_initialized_opencl();
+    
+    const auto something_else = compute_something_else();
+    draw(something_else);
+}
+
+// etc.
+```
+
+The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously handwritten code has disappeared.
 
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
 ```c++
@@ -70,7 +126,7 @@ auto lazy(auto f) {
 }
 ```
 
-As can be seen, `lazy()` simply wraps `f()` with an additional layer which keeps track of the flag and only calls `f()` when this flag is `false` and subsequently sets the flag to `true`.
+As can be seen, `lazy()` simply returns a new function that wraps `f()` and keeps track of the flag `is_called` and only calls `f()` when this flag is `false` and subsequently sets the flag to `true` such that the next time the lazy function is called, it will no longer call `f()`.
 
 # Caching
 In the previous example we wrapped a function that did not return any value. Often, however, functions do return something useful. Consider for example a function that performs a relatively expensive calculation but also returns the result from that calculation. In order to support this use case, the `pigro::lazy()` utility will cache any value returned by the wrapped function. Any subsequent time that the function is called, it simply returns the previously-cached value:
@@ -176,7 +232,7 @@ auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 
 Now, the `arrow()` function can be used as dependency for the `render_mouse_cursor()` function, while at the same time being optimized to be called only once.
 
-# Syntax sugar
+# Syntactic sugar
 Because the previous pattern occurs quite often, i.e. having a constant-valued dependency that should be cached, there is a short-hand syntax available such that we can pass values directly as dependencies to the `pigro::lazy()` utility:
 ```c++
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
@@ -251,59 +307,6 @@ auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 // Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
-}
-```
-
-## Comparison with hand-coded solution
-**Lazy & Reactive - using `pigro`**
-```c++
-auto mode = lazy(get_drawing_mode);
-auto filename = lazy(get_mouse_icon_filename, mode);
-auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
-
-// Rendering loop for a graphical editor
-while (true) {
-    mouse_cursor();
-}
-```
-
-**Hand-coded**
-```c++
-auto should_render_mouse_cursor = false;
-auto cache_pos = std::optional<point_2d>{};
-auto cache_icon = std::optional<image>{};
-auto cache_filename = std::optional<std::string>{};
-auto cache_mode = std::optional<drawing_mode>{};
-
-// Rendering loop for a graphical editor
-while (true) {
-    const auto pos = get_mouse_pos();
-    if (cache_pos != pos) {
-        cache_pos = pos;
-        should_render_mouse_cursor = true;
-    }
-
-    const auto mode = get_drawing_mode();
-    if (cache_mode != mode) {
-        cache_mode = mode;
-
-        const auto filename = get_mouse_icon_filename(mode);
-        if (cache_filename != filename) {
-            cache_filename = filename;
-
-            const auto icon = load_image(filename);
-            if (cache_icon != icon) {
-                cache_icon = icon;
-
-                should_render_mouse_cursor = true;
-            }
-        }
-    }
-
-    if (should_render_mouse_cursor /* && cache_pos && cache_icon */) {
-        render_mouse_cursor(*cache_pos, *cache_icon);
-    }
 }
 ```
 
