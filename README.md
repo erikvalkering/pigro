@@ -176,7 +176,7 @@ auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 
 Now, the `arrow()` function can be used as dependency for the `render_mouse_cursor()` function, while at the same time being optimized to be called only once.
 
-# Syntax sugar
+# Syntactic sugar
 Because the previous pattern occurs quite often, i.e. having a constant-valued dependency that should be cached, there is a short-hand syntax available such that we can pass values directly as dependencies to the `pigro::lazy()` utility:
 ```c++
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
