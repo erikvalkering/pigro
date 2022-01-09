@@ -35,7 +35,7 @@ if (should_draw_something_else) {
 // etc.
 ```
 
-Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and cannot be compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly, by a call to `initialize_opencl()`:
+Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and cannot be compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly (e.g. by a call to `initialize_opencl()`):
 
 ```c++
 auto initialize_opengl() -> void;
