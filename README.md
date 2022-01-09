@@ -78,7 +78,7 @@ if (should_draw_something_else) {
 // etc.
 ```
 
-As can be seen, keeping track of this extra flag has has a negative impact on the maintainability of the code (in fact, there is a bug in the code).
+As can be seen, code written in this way has a negative impact on the maintainability of it (in fact, there is a bug in the code).
 
 Instead, it would be better to combine each initialization function and its corresponding flag into a single entity. This is where the `pigro::lazy()` function comes into play. Using it will wrap an existing function, and make sure that it will be called at most once:
 ```c++
@@ -107,7 +107,7 @@ if (should_draw_something_else) {
 ```
 > Ignore the fact that there is still an implicit ordering dependency between the calls to `draw()` and `ensure_initialized_opengl()` as well as between `compute_***()` and `ensure_initialized_opencl()`, which is just bad design but which is not the point of this example.
 
-The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code.
+The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously hand-written code has disappeared.
 
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
 ```c++
