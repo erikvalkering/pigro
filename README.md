@@ -1,7 +1,12 @@
 # Pigro
 _Lazy evaluation on steroids_
 
+# TL;DR
 Pigro is a C++20 library that allows you to define functions in a declarative and reactive way, resulting in code that is easier to reason about, easier to maintain, and less prone to errors.
+
+Handwritten                          |        Using `pigro::lazy()`
+:-----------------------------------:|:------------------------------------:
+![](docs/comparison-handwritten.png) | ![](docs/comparison-using-pigro.png)
 
 # Lazy functions
 Let's start out with the simplest use case: we want to make sure that some function is called at most once. Imagine we have several functions that use some global resources (e.g. an OpenGL rendering system) and a function that initializes those resources (e.g. `initialize_opengl()`). Before calling those functions that use the global resources, we must make sure that the `initialize_opengl()` function has been called. Furthermore, this should be done at most once, because otherwise it would reset the entire rendering system, undoing all of the rendering work that has been performed so far. Now also assume that for some reason we want to postpone this initialization as long as possible, because it might for example be a very heavy operation, and our application may not always need to use the rendering system. Therefore, simply calling `initialize_opengl()` on startup wouldn't be sufficient.
@@ -302,59 +307,6 @@ auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
 // Rendering loop for a graphical editor
 while (true) {
     mouse_cursor();
-}
-```
-
-## Comparison with hand-coded solution
-**Lazy & Reactive - using `pigro`**
-```c++
-auto mode = lazy(get_drawing_mode);
-auto filename = lazy(get_mouse_icon_filename, mode);
-auto icon = lazy(load_image, filename);
-auto mouse_cursor = lazy(render_mouse_cursor, get_mouse_pos, icon);
-
-// Rendering loop for a graphical editor
-while (true) {
-    mouse_cursor();
-}
-```
-
-**Hand-coded**
-```c++
-auto should_render_mouse_cursor = false;
-auto cache_pos = std::optional<point_2d>{};
-auto cache_icon = std::optional<image>{};
-auto cache_filename = std::optional<std::string>{};
-auto cache_mode = std::optional<drawing_mode>{};
-
-// Rendering loop for a graphical editor
-while (true) {
-    const auto pos = get_mouse_pos();
-    if (cache_pos != pos) {
-        cache_pos = pos;
-        should_render_mouse_cursor = true;
-    }
-
-    const auto mode = get_drawing_mode();
-    if (cache_mode != mode) {
-        cache_mode = mode;
-
-        const auto filename = get_mouse_icon_filename(mode);
-        if (cache_filename != filename) {
-            cache_filename = filename;
-
-            const auto icon = load_image(filename);
-            if (cache_icon != icon) {
-                cache_icon = icon;
-
-                should_render_mouse_cursor = true;
-            }
-        }
-    }
-
-    if (should_render_mouse_cursor /* && cache_pos && cache_icon */) {
-        render_mouse_cursor(*cache_pos, *cache_icon);
-    }
 }
 ```
 
