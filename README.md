@@ -105,7 +105,6 @@ if (should_draw_something_else) {
 
 // etc.
 ```
-> Ignore the fact that there is still an implicit ordering dependency between the calls to `draw()` and `ensure_initialized_opengl()` as well as between `compute_***()` and `ensure_initialized_opencl()`, which is just bad design but which is not the point of this example.
 
 The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously hand-written code has disappeared.
 
