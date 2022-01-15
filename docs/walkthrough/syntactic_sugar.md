@@ -1,13 +1,13 @@
 # Syntactic sugar
 Because the previous pattern occurs quite often, i.e. having a constant-valued dependency that should be cached, there is a short-hand syntax available such that we can pass values directly as dependencies to the `pigro::lazy()` utility:
-```c++
+```cpp
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, load_image("arrow.png"));
 ```
 
 This will wrap the image dependency with a lazy function, such that the value will be cached and used inside of the `render_mouse_cursor()` function, instead of loading the images every time.
 
 In order to make this work, we actually don't need to modify the implementation of the existing `pigro::lazy()` utility, but merely constrain it a bit and add a new overload:
-```c++
+```cpp
 auto lazy(auto f, std::invocable auto ...dependencies) {
     // ...as before...
 }

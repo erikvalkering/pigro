@@ -1,7 +1,7 @@
 # Caching
 In the previous example we wrapped a function that did not return any value. Often, however, functions do return something useful. Consider for example a function that performs a relatively expensive calculation but also returns the result from that calculation. In order to support this use case, the `pigro::lazy()` utility will cache any value returned by the wrapped function. Any subsequent time that the function is called, it simply returns the previously-cached value:
 
-```c++
+```cpp
 auto deep_thought() {
     // simulate some very expensive calculation
     this_thread::sleep(7500000y);
@@ -19,7 +19,7 @@ assert(universe_and_everything == 42);
 ```
 
 As before, a **heavily simplified** version of the `pigro::lazy()` function might give a better understand of what is going on behind the scenes:
-```c++
+```cpp
 auto lazy(auto f) {
     auto cache = std::optional<decltype(f())>{};
 

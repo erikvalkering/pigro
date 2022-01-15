@@ -32,7 +32,7 @@ if (should_draw_something_else) {
 
 Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and cannot be compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly (e.g. by a call to `initialize_opencl()`):
 
-```c++
+```cpp
 auto initialize_opengl() -> void;
 auto initialize_opencl() -> void;
 auto is_initialized_opengl = false;
@@ -76,7 +76,7 @@ if (should_draw_something_else) {
 As can be seen, code written in this way has a negative impact on the maintainability of it (in fact, there is a bug in the code).
 
 Instead, it would be better to combine each initialization function and its corresponding flag into a single entity. This is where the `pigro::lazy()` function comes into play. Using it will wrap an existing function, and make sure that it will be called at most once:
-```c++
+```cpp
 auto ensure_initialized_opengl = pigro::lazy(initialize_opengl);
 auto ensure_initialized_opencl = pigro::lazy(initialize_opencl);
 
@@ -104,7 +104,7 @@ if (should_draw_something_else) {
 The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously handwritten code has disappeared.
 
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
-```c++
+```cpp
 auto lazy(auto f) {
     auto is_called = false;
     return [=]() mutable {

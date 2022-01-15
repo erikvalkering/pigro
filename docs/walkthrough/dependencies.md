@@ -1,7 +1,7 @@
 # Dependencies
 In the previous two examples, the main use case for both was to ensure that the wrapped function is called at most once. However, in some cases an event might require that the wrapped function to be called again. Consider for example a graphical editor, with a rendering loop, in which we need to render a mouse cursor:
 
-```c++
+```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
@@ -17,7 +17,7 @@ As an optimization, we might want to skip the render call if the mouse was not m
 Fortunately, the `pigro::lazy()` utility also has this use case covered, and this is actually where the Pigro library shines: Reactive Programming.
 
 In addition to passing the render function, `pigro::lazy()` accepts additional _dependencies_ - _functions_ which are supposed to provide the inputs to the wrapped function:
-```c++
+```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
@@ -33,7 +33,7 @@ while (true) {
 
 Now, when the lazy `mouse_cursor()` function is being called, it will first check whether any dependency has changed, and if so, only then it will call the actual wrapped function. As a result, the `render_mouse_cursor()` function will _only_ be called if the mouse was in fact moved (i.e. if `get_mouse_pos()` returned a different value). A look behind the scenes might give away the magic that is going on (again **heavily simplified**):
 
-```c++
+```cpp
 auto lazy(auto f, auto ...dependencies) {
     auto cache = std::optional<decltype(f())>{};
     auto dependencies_cache = std::optional<decltype(std::tuple{dependencies()})>{};
@@ -57,7 +57,7 @@ Although this is slightly more complex than the previous version, it opens up ni
 A keen eye may have noticed that there is some redundant work being done. Each time that the mouse is being moved, we render the mouse cursor. However, we are also loading the arrow image again and again, even though this image might not change.
 
 Which the current functionality, this issue is easily fixed:
-```c++
+```cpp
 // ...
 auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);

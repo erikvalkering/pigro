@@ -1,6 +1,6 @@
 ## Extra laziness
 One drawback of passing the image as a value dependency, is that it will be evaluated, even in the case that it might never be called. For example, it the following case this would unnecessarily load resources from disk:
-```c++
+```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
@@ -18,7 +18,7 @@ while (true) {
 ```
 
 This can now also be fixed quite easily, by making the arrow fully lazy:
-```c++
+```cpp
 auto arrow = pigro::lazy(load_image, "arrow.png");
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 ```
