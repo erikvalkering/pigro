@@ -8,8 +8,6 @@ Handwritten                     |           Using Pigro
 :------------------------------:|:-------------------------------:
 ![](comparison-handwritten.png) | ![](comparison-using-pigro.png)
 
-
-
 # Features
 - [x] easy creation of cached functions
 - [x] reactivity by specifying dependencies
