@@ -7,3 +7,7 @@ Pigro is a C++20 library that allows you to define functions in a declarative an
 Handwritten                     |           Using Pigro
 :------------------------------:|:-------------------------------:
 ![](comparison-handwritten.png) | ![](comparison-using-pigro.png)
+
+[Features](#features)
+[Design walkthrough](walkthrough/)
+[Github](https://github.com/erikvalkering/pigro)
