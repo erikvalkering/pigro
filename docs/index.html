@@ -41,7 +41,7 @@
               Element.prototype.msMatchesSelector
 
             let zoom
-            hook.doneEach((_) => {
+            hook.ready((_) => {
               let elms = Array.apply(
                 null,
                 document.querySelectorAll(
