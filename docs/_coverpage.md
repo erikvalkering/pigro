@@ -9,5 +9,4 @@ Handwritten                     |           Using Pigro
 ![](comparison-handwritten.png) | ![](comparison-using-pigro.png)
 
 [Features](#features)
-[Design walkthrough](walkthrough/)
 [Github](https://github.com/erikvalkering/pigro)
