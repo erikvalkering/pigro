@@ -9,4 +9,3 @@ Handwritten                     |           Using Pigro
 ![](comparison-handwritten.png) | ![](comparison-using-pigro.png)
 
 [Features](#features)
-[Github](https://github.com/erikvalkering/pigro)
