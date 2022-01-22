@@ -1,3 +1,6 @@
+# Pigro
+_Lazy evaluation on steroids_
+
 # Features
 - [x] easy creation of cached functions
 - [x] reactivity by specifying dependencies
