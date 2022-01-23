@@ -9,4 +9,4 @@ Handwritten                     |           Using Pigro
 :------------------------------:|:-------------------------------:
 ![](comparison-handwritten.png) | ![](comparison-using-pigro.png)
 
-[Features](#features)
+<a href="javascript:scrollIntoView('features')">Features</a>

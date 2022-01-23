@@ -68,6 +68,13 @@
           },
         ],
       }
+
+      function scrollIntoView(id) {
+        const el = document.getElementById(id)
+        if (el === undefined) return
+
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
     </script>
     <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
 
