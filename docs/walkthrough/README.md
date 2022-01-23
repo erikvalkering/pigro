@@ -1,1 +1,2 @@
 # Design walkthrough
+In order to get a thorough understanding of how this library works under the hood, this guide will walk you through the design of Pigro. It will start by discussing the most simple use case and a possible implementation for making that work. Next, it will gradually expand on that example and show how the implementation needs to be adjusted to accommodate for the new requirements.
