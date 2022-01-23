@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+
+    <link rel="shortcut icon" type="image/x-icon" href="_media/logo.svg" />
+
+    <link
+      rel="stylesheet"
+      href="//unpkg.com/docsify-themeable@0/dist/css/theme-simple-dark.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="//unpkg.com/prismjs@1.26.0/themes/prism-okaidia.min.css"
+    />
+  </head>
+  <body>
+    <div id="app">Please wait...</div>
+    <script>
+      window.$docsify = {
+        name: 'Pigro',
+        loadSidebar: true,
+        logo: '/_media/logo.svg',
+        subMaxLevel: 2,
+        coverpage: true,
+        repo: 'https://github.com/erikvalkering/pigro',
+        auto2top: true,
+        pagination: {
+          crossChapter: true,
+        },
+        timeUpdater: {
+          text: `>[!note]\n>Last updated: {docsify-updated}`,
+          formatUpdated: '{YYYY}/{MM}/{DD}',
+        },
+        themeable: {
+          responsiveTables: false,
+        },
+        customPageTitle: {
+          prefix: 'Pigro', // [optional] title prefix. default: false eg: prefix: "Application"
+        },
+
+        plugins: [
+          function zoomImage(hook) {
+            const matchesSelector =
+              Element.prototype.matches ||
+              Element.prototype.webkitMatchesSelector ||
+              Element.prototype.msMatchesSelector
+
+            let zoom
+            hook.ready((_) => {
+              let elms = Array.apply(
+                null,
+                document.querySelectorAll(
+                  '.markdown-section img:not(.emoji):not([data-no-zoom]), .cover img:not(.emoji):not([data-no-zoom])'
+                )
+              )
+              elms = elms.filter(
+                (elm) => matchesSelector.call(elm, 'a img') === false
+              )
+              if (zoom) {
+                zoom.detach()
+              }
+              zoom = mediumZoom(elms)
+            })
+          },
+        ],
+      }
+
+      function scrollIntoView(id) {
+        const el = document.getElementById(id)
+        if (el === undefined) return
+
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
+    </script>
+    <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+
+    <script src="//unpkg.com/prismjs@1.26.0/components/prism-c.min.js"></script>
+    <script src="//unpkg.com/prismjs@1.26.0/components/prism-cpp.min.js"></script>
+
+    <script src="//unpkg.com/@rakutentech/docsify-code-inline/dist/index.min.js"></script>
+    <script src="//unpkg.com/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+    <script src="//unpkg.com/docsify-count/dist/countable.min.js"></script>
+    <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+    <script src="//unpkg.com/docsify-plugin-flexible-alerts"></script>
+    <script src="//unpkg.com/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+    <script src="//unpkg.com/docsify-updated@1/src/time-updater.min.js"></script>
+    <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+    <script src="//unpkg.com/@sujaykumarh/docsify-plugin-title@1.x/dist/plugin.min.js"></script>
+    <script src="//unpkg.com/medium-zoom"></script>
+  </body>
+</html>
