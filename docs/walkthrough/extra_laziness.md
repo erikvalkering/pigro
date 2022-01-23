@@ -1,4 +1,4 @@
-## Extra laziness
+# Extra laziness
 One drawback of passing the image as a value dependency, is that it will be evaluated, even in the case that it might never be called. For example, it the following case this would unnecessarily load resources from disk:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
