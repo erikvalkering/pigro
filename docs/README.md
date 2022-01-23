@@ -8,6 +8,8 @@ _Lazy evaluation on steroids_
 - [x] skipping re-evaluation if dependencies evaluate to same values as previous ones
 - [x] skipping comparison of lazy function dependencies if they were not re-evaluated
 - [x] memory optimization for void functions
+
+# Roadmap
 - [ ] memory optimization for stateless dependencies
 - [ ] memory optimization for dependencies (only store cached result and any stateful transitive dependencies
 
