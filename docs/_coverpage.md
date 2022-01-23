@@ -1,4 +1,4 @@
-<img src='_media/logo.svg' alt='logo' width='40%' />
+<img src='_media/logo.svg' alt='logo' width='40%' data-no-zoom />
 
 # Pigro
 > Lazy evaluation on steroids
