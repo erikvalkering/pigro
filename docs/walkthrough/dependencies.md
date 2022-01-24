@@ -56,7 +56,7 @@ Although this is slightly more complex than the previous version, it opens up ni
 
 A keen eye may have noticed that there is some redundant work being done. Each time that the mouse is being moved, we render the mouse cursor. However, we are also loading the arrow image again and again, even though this image might not change.
 
-Which the current functionality, this issue is easily fixed:
+With the current functionality, this issue is easily fixed:
 ```cpp
 // ...
 auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
