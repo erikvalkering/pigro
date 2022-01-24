@@ -194,6 +194,16 @@ auto sfinae_friendliness_test() {
     expect(f(1.0) == 2_i);
 }
 
+auto overload_resolution_test() {
+    auto f = overload{
+        bind_back([](const int &) { return 1; }),
+        [](const double &) { return 2; },
+    };
+
+    expect_that(f(0) == 1);
+    expect_that(f(0.0) == 2);
+}
+
 suite bind_back_tests = [] {
     "by_value"_test = by_value_test;
 
@@ -206,6 +216,8 @@ suite bind_back_tests = [] {
     "lvalue_reference_callable"_test = lvalue_reference_callable_test;
 
     "SFINAE-friendliness"_test = sfinae_friendliness_test;
+
+    "overload_resolution"_test = overload_resolution_test;
 };
 
 suite bind_back_tuple_tests = [] {
