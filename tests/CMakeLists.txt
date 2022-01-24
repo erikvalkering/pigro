@@ -15,7 +15,12 @@ add_executable(tests
     uncapture.test.cpp
     utils.test.cpp
 )
-set_property(TARGET tests PROPERTY CXX_STANDARD 20)
+
+set_target_properties(tests PROPERTIES
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+)
+
 target_include_directories(tests PRIVATE ../extlib)
 target_compile_options(tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
