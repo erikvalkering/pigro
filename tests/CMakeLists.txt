@@ -24,5 +24,5 @@ set_target_properties(tests PROPERTIES
 target_include_directories(tests PRIVATE ../extlib)
 target_compile_options(tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic>
 )
