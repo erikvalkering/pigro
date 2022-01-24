@@ -21,7 +21,7 @@ auto ensure_invocable(auto dependency) {
 }
 
 auto lazy(auto f, auto ...dependencies) {
-    return lazy(f, ensure_invocable(dependencies...));
+    return lazy(f, ensure_invocable(dependencies)...);
 }
 ```
 
