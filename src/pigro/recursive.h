@@ -10,6 +10,7 @@ namespace pigro {
 template<typename F>
 struct recursive : F {
     static_assert(!std::is_const_v<F>);
+    static_assert(!std::is_volatile_v<F>);
     static_assert(!std::is_reference_v<F>);
 
     template<typename... Args>
