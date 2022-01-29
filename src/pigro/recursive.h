@@ -13,24 +13,20 @@ struct recursive : F {
     static_assert(!std::is_volatile_v<F>);
     static_assert(!std::is_reference_v<F>);
 
-    template<typename... Args>
-    constexpr auto operator()(Args &&...args) & -> decltype(std::invoke(static_cast<F &>(*this), *this, std::forward<Args>(args)...)) {
-        return std::invoke(static_cast<F &>(*this), *this, std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(auto &&...args) & requires std::invocable<F &, recursive &, decltype(args)...> {
+        return std::invoke(static_cast<F &>(*this), *this, FWD(args)...);
     }
 
-    template<typename... Args>
-    constexpr auto operator()(Args &&...args) && -> decltype(std::invoke(static_cast<F &&>(*this), std::move(*this), std::forward<Args>(args)...)) {
-        return std::invoke(static_cast<F &&>(*this), std::move(*this), std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(auto &&...args) && requires std::invocable<F &&, recursive &&, decltype(args)...> {
+        return std::invoke(static_cast<F &&>(*this), std::move(*this), FWD(args)...);
     }
 
-    template<typename... Args>
-    constexpr auto operator()(Args &&...args) const & -> decltype(std::invoke(static_cast<const F &>(*this), *this, std::forward<Args>(args)...)) {
-        return std::invoke(static_cast<const F &>(*this), *this, std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(auto &&...args) const &requires std::invocable<const F &, const recursive &, decltype(args)...> {
+        return std::invoke(static_cast<const F &>(*this), *this, FWD(args)...);
     }
 
-    template<typename... Args>
-    constexpr auto operator()(Args &&...args) const && -> decltype(std::invoke(static_cast<const F &&>(*this), std::move(*this), std::forward<Args>(args)...)) {
-        return std::invoke(static_cast<const F &&>(*this), std::move(*this), std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(auto &&...args) const &&requires std::invocable<const F &&, const recursive &&, decltype(args)...> {
+        return std::invoke(static_cast<const F &&>(*this), std::move(*this), FWD(args)...);
     }
 };
 
