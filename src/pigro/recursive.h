@@ -3,6 +3,7 @@
 #include "forward_like.h"
 #include "utils.h"
 
+#include <concepts>
 #include <utility>
 
 namespace pigro {
