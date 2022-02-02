@@ -195,13 +195,20 @@ auto sfinae_friendliness_test() {
 }
 
 auto overload_resolution_test() {
+    struct Foo {};
     auto f = overload{
-        bind_back([](const int &) { return 1; }),
-        [](const double &) { return 2; },
+        bind_back([](int) { return 1; }),
+        bind_back([](std::string) { return 2; }),
+        bind_back([x = 0](Foo) mutable { x++; return 3; }),
     };
 
     expect_that(f(0) == 1);
-    expect_that(f(0.0) == 2);
+    expect_that(f("asdf") == 2);
+    expect_that(f(Foo{}) == 3);
+
+    const auto g = f;
+    expect_that(g(0) == 1);
+    expect_that(g("asdf") == 2);
 }
 
 suite bind_back_tests = [] {
