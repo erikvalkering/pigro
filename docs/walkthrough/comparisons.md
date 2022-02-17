@@ -15,3 +15,6 @@ while (true) {
 ```
 
 There is a subtle performance issue here: if we don't move the mouse, we don't need to redraw the mouse cursor. You'd therefore expect the call to `mouse_cursor()` to be a very cheap operation. Unfortunately, with the current design of the `pigro::lazy()` function, we have to compare *all* of the evaluations of the dependencies with those previously cached, including the `arrow` dependency. Even though the *evaluation* of the `arrow` dependency is very cheap (i.e. it returns the cached value instead of reloading the image), the comparison is not cheap at all: it needs to perform a comparison between two `image` objects each time before `mouse_cursor()` realizes nothing needs to be done.
+
+What we need, is a way to tell whether the value returned from the dependency was newly computed, or not, in which case we don't need to perform the comparison. If the dependency was a simple function, it will always be recomputed. Only if the dependency is a lazy function (or a value, which are converted into lazy functions), the computed value will be cached within the lazy function. Therefore, we should only consider this latter case: dependencies that are lazy.
+
