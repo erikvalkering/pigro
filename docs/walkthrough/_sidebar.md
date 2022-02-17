@@ -5,6 +5,7 @@
     - [Dependencies](walkthrough/dependencies.md)
     - [Syntactic sugar](walkthrough/syntactic_sugar.md)
     - [Extra laziness](walkthrough/extra_laziness.md)
+    - [Avoiding comparisons](walkthrough/comparisons.md)
     - [Reactivity all the way down](walkthrough/reactivity_all_the_way_down.md)
 - **Links**
 - [Github](https://github.com/erikvalkering/pigro)
