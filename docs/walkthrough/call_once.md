@@ -30,7 +30,7 @@ if (should_draw_something_else) {
 // etc.
 ```
 
-Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and cannot be compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly (e.g. by a call to `initialize_opencl()`):
+Apart from the boilerplate, this ties an **implicit** relationship between the `initialize_opengl()` function and the `is_initialized` flag, which is a [code smell](https://en.wikipedia.org/wiki/Code_smell) because this knowledge lies only with the developer(s) and therefore keeping them in-sync isn't compiler-enforced. This would become even more of a problem if you would have several functions that need to be called at most once. In such cases, you'd need to keep track of a separate flag for each function. For example, consider what it would look like, if in addition to the rendering system, we now also have a compute system that needs to be initialized similarly (e.g. by a call to `initialize_opencl()`):
 
 ```cpp
 auto initialize_opengl() -> void;
@@ -101,7 +101,7 @@ if (should_draw_something_else) {
 // etc.
 ```
 
-The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously handwritten code has disappeared.
+The resulting code is much cleaner: there is less boilerplate, but more importantly, the `is_initialized` flag is now maintained inside of the `ensure_initialized()` function, resulting in a better maintainable code. Additionally, the bug in the previously handwritten code has disappeared (before, the `is_initialized_opengl` flag would be set after calling `initialize_opencl()`, instead of setting the `is_initialized_opencl` flag).
 
 In order to better understand what is going on behind the scenes, the following is a **heavily simplified** version of the `pigro::lazy()` function:
 ```cpp
