@@ -16,7 +16,7 @@ As an optimization, we might want to skip the render call if the mouse was not m
 
 Fortunately, the `pigro::lazy()` utility also has this use case covered, and this is actually where the Pigro library shines: Reactive Programming.
 
-In addition to passing the render function, `pigro::lazy()` accepts additional **dependencies** - _functions_ which are supposed to provide the inputs to the wrapped function:
+In addition to passing the render function, `pigro::lazy()` accepts additional **dependencies** - *functions* which are supposed to provide the inputs to the wrapped function:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
@@ -31,7 +31,7 @@ while (true) {
 }
 ```
 
-Now, when the lazy `mouse_cursor()` function is being called, it will first check whether any dependency has changed, and if so, only then it will call the actual wrapped function. As a result, the `render_mouse_cursor()` function will _only_ be called if the mouse was in fact moved (i.e. if `get_mouse_pos()` returned a different value). A look behind the scenes might give away the magic that is going on (again **heavily simplified**):
+Now, when the lazy `mouse_cursor()` function is being called, it will first check whether any dependency has changed, and if so, only then it will call the actual wrapped function. As a result, the `render_mouse_cursor()` function will *only* be called if the mouse was in fact moved (i.e. if `get_mouse_pos()` returned a different value). A look behind the scenes might give away the magic that is going on (again **heavily simplified**):
 
 ```cpp
 auto lazy(auto f, auto ...dependencies) {
@@ -50,7 +50,7 @@ auto lazy(auto f, auto ...dependencies) {
 }
 ```
 
-This new version of the `pigro::lazy()` utility keeps track of two caches: one for the wrapped function, and another that bundles all of the return values from the dependencies. Now, in order to determine whether we should call our wrapped function, we simply check whether the function cache was previously filled, or whether any of the dependencies have changed, by comparing them against this second _dependencies_ cache.
+This new version of the `pigro::lazy()` utility keeps track of two caches: one for the wrapped function, and another that bundles all of the return values from the dependencies. Now, in order to determine whether we should call our wrapped function, we simply check whether the function cache was previously filled, or whether any of the dependencies have changed, by comparing them against this second *dependencies* cache.
 
 Although this is slightly more complex than the previous version, it opens up nice new possibilities.
 
