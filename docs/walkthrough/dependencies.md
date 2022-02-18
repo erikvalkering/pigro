@@ -16,7 +16,7 @@ As an optimization, we might want to skip the render call if the mouse was not m
 
 Fortunately, the `pigro::lazy()` utility also has this use case covered, and this is actually where the Pigro library shines: Reactive Programming.
 
-In addition to passing the render function, `pigro::lazy()` accepts additional _dependencies_ - _functions_ which are supposed to provide the inputs to the wrapped function:
+In addition to passing the render function, `pigro::lazy()` accepts additional **dependencies** - _functions_ which are supposed to provide the inputs to the wrapped function:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
