@@ -14,7 +14,13 @@ while (true) {
 }
 ```
 
-There is a subtle performance issue here: if we don't move the mouse, we don't need to redraw the mouse cursor. You'd therefore expect the call to `mouse_cursor()` to be a very cheap operation. Unfortunately, with the current design of the `pigro::lazy()` function, this is far from cheap. Here is again the core algorithm of the current design:
+There is a subtle performance issue here: if we don't move the mouse, we don't need to redraw the mouse cursor. You'd therefore expect the call to `mouse_cursor()` to be a very cheap operation. Unfortunately, as it will turn out, this operation is far from cheap. Before the `mouse_cursor()` lazy function realizes nothing needs to be done, it needs to check whether any of its dependencies have changed.
+
+For the first dependency, we are simply calling the non-lazy `get_mouse_pos()` function and compare it against the previously cached value, which turns out to be the same. This comparison cannot be avoided, but is fortunately rather cheap, just a comparison of two points.
+
+Next, we check the `arrow` dependency: even though the *evaluation* is very cheap (i.e. being a lazy function dependency, it returns the cached value instead of reloading the image), the *comparison* may not be cheap at all: it needs to perform a comparison between two `image` objects in order to determine whether the dependency has changed. Depending on how the `image` type is implemented, this may be a very costly operation, worst-case involving a comparison of all the pixel data.
+
+In order to get a better understanding of the issue in general, let's revisit the current design that we have of the `pigro::lazy()` function:
 ```cpp
 auto lazy(auto f, std::invocable auto ...dependencies) {
     auto cache = std::optional<decltype(f())>{};
@@ -32,7 +38,7 @@ auto lazy(auto f, std::invocable auto ...dependencies) {
 }
 ```
 
-As can be seen, in order to determine whether we need to reevaluate the lazy function, we are **unconditionally** comparing *all* of the evaluations of the dependencies with those previously cached (i.e. the `args != dependencies_cache` bit), even if they did **not** change. Even though the *evaluation* of the `arrow` dependency is very cheap (i.e. it returns the cached value instead of reloading the image), the comparison is not cheap at all: it needs to perform a comparison between two `image` objects each time before `mouse_cursor()` realizes nothing needs to be done.
+As can be seen, in order to determine whether we need to reevaluate the lazy function, we are **unconditionally** comparing *all* of the evaluations of the dependencies with those previously cached (i.e. the `args != dependencies_cache` bit), even if they did **not** change.
 
 What we need, is a way to tell whether the value returned from the dependency was newly computed, or not, in which case we don't need to perform the comparison. If the dependency was a simple function, it will always be recomputed. Only if the dependency is a lazy function (or a value, which are converted into lazy functions), the computed value will be cached within the lazy function. Therefore, we should only consider this latter case: dependencies that are lazy.
 
