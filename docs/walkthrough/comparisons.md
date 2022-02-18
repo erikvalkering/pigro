@@ -23,7 +23,7 @@ Next, we check the `arrow` dependency: even though the *evaluation* is very chea
 In order to get a better understanding of the issue in general, let's revisit the current design that we have of the `pigro::lazy()` function:
 ```cpp
 auto lazy(auto f, std::invocable auto ...dependencies) {
-    auto cache = std::optional<decltype(f())>{};
+    auto cache = std::optional<decltype(f(dependencies()...))>{};
     auto dependencies_cache = std::optional<decltype(std::tuple{dependencies()...})>{};
 
     return [=]() mutable {

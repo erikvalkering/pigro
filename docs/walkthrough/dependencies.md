@@ -35,7 +35,7 @@ Now, when the lazy `mouse_cursor()` function is being called, it will first chec
 
 ```cpp
 auto lazy(auto f, auto ...dependencies) {
-    auto cache = std::optional<decltype(f())>{};
+    auto cache = std::optional<decltype(f(dependencies()...))>{};
     auto dependencies_cache = std::optional<decltype(std::tuple{dependencies()...})>{};
 
     return [=]() mutable {
