@@ -39,13 +39,12 @@ auto ensure_lazy(concepts::lazy auto dependency) {
     return dependency;
 }
 
-auto ensure_lazy(auto dependency) {
-    return lazy_value(dependency, false);
+auto ensure_lazy(std::invocable auto dependency) requires concepts::lazy<decltype(dependency)> {
+    return dependency;
 }
 
-auto ensure_lazy(std::invocable auto dependency)
-    requires concepts::lazy<decltype(dependency)> {
-    return dependency;
+auto ensure_lazy(auto dependency) {
+    return lazy_value(dependency, false);
 }
 
 auto ensure_lazy(std::invocable auto dependency) {

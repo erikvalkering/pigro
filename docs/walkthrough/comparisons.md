@@ -193,8 +193,7 @@ auto foo_c = pigro::lazy(foo, 42);
 
 In order to add back support for the final use-case, the normal non-lazy function dependencies, we just have to add a few more overloads to the `ensure_lazy()` overload set:
 ```cpp
-auto ensure_lazy(std::invocable auto dependency)
-    requires concepts::lazy<decltype(dependency)> {
+auto ensure_lazy(std::invocable auto dependency) requires concepts::lazy<decltype(dependency)> {
     return dependency;
 }
 
