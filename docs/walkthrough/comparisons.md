@@ -205,7 +205,7 @@ auto ensure_lazy(std::invocable auto dependency) {
 }
 ```
 
-The first overload is to support lazy functions as dependency that have already gotten the facade treatment, and therefore can be called with and without the `nullptr` argument. The second overload adds support for the actual normal non-lazy function dependencies: it wraps the dependency inside of another function that accepts a single int-parameter. This parameter in turn is provided by wrapping this function using a call to `pigro::lazy()`, and using the `lazy_value()` utility to create a dependency that returns `0` and always indicates it has changed, which is exactly the behaviour we had in the previous version.
+The first overload is to support lazy functions as dependency that have already gotten the facade treatment, and therefore can be called with and without the `nullptr` argument. The second overload adds support for the actual normal non-lazy function dependencies: it wraps the dependency inside of another function that accepts a single `int`-parameter. This parameter in turn is provided by wrapping this function using a call to `pigro::lazy()`, and using the `lazy_value()` utility to create a dependency that returns `0` and always indicates it has changed, which is exactly the behaviour we had in the previous version.
 
 So now, we have added back support for all three use-cases:
 ```cpp
