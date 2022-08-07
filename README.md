@@ -13,4 +13,4 @@ Handwritten                          |        Using `pigro::lazy()`
 :-----------------------------------:|:------------------------------------:
 ![](docs/comparison-handwritten.png) | ![](docs/comparison-using-pigro.png)
 
-For the most up-to-date documentation, visit https://erikvalkering.github.io/pigro.
+For the documentation, visit https://erikvalkering.github.io/pigro.

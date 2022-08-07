@@ -129,7 +129,7 @@ auto lazy(auto f, auto ...dependencies) {
 }
 ```
 
-So now the `lazy()` function just wraps the result of the `lazy_core()` function inside of a facade, that either forwards to the lazy function, or forwards to the lazy function **and** "unwraps" the resulting `value`. This should also make it clear why we had to rename the core algorithm to have the `_core` suffix: because otherwise we would have a ambiguity between the facade and the core algorithm.
+So now the `lazy()` function just wraps the result of the `lazy_core()` function inside of a facade, that either forwards to the lazy function, or forwards to the lazy function **and** "unwraps" the resulting `value`. This should also make it clear why we had to rename the core algorithm to have the `_core` suffix: because otherwise we would have an ambiguity between the facade and the core algorithm.
 
 Now, we are back with the original syntax:
 
