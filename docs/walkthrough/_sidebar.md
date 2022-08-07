@@ -6,6 +6,7 @@
         - [Dependencies](walkthrough/dependencies.md)
         - [Syntactic sugar](walkthrough/syntactic_sugar.md)
         - [Extra laziness](walkthrough/extra_laziness.md)
+        - [Analysis](walkthrough/basic_analysis.md)
     - [Second attempt - more advanced design](walkthrough/advanced.md)
         - [Avoiding comparisons](walkthrough/comparisons.md)
     - [Final design](walkthrough/final_design.md)
