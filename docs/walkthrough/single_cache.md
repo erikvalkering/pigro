@@ -85,3 +85,5 @@ auto mouse_pos() {
     };
 }
 ```
+
+Unfortunately, in the above examples, defining the dependencies themselves still requires quite some boilerplate. Furthermore, there is quite some overlap between those functions and the `lazy()` function. Finally, it is not possible yet to define a lazy function using the `lazy()` function, and use that as a dependency for another lazy function that is also defined using the `lazy()` function. In the next section, we'll discuss how we can further improve on the new design to simplify this even further, and tackle all of these problems.
