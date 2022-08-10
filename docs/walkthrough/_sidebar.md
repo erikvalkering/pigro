@@ -9,6 +9,7 @@
         - [Analysis](walkthrough/basic_analysis.md)
     - [Second attempt - more advanced design](walkthrough/advanced.md)
         - [Avoiding double dependencies cache](walkthrough/single_cache.md)
+        - [Simplified new design](walkthrough/simplified_new_design.md)
         - [Avoiding comparisons](walkthrough/comparisons.md)
     - [Final design](walkthrough/final_design.md)
     - [Reactivity all the way down](walkthrough/reactivity_all_the_way_down.md)
