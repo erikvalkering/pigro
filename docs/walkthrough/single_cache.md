@@ -36,32 +36,63 @@ auto lazy(auto f, auto ...dependencies) {
 
 - This result in a very flexible design, as it allows us to customize completely the result of the lazy function in an ad-hoc fashion (i.e. if pigro::lazy doesn't support some use case, we can just create a new function that returns a lazy_result).
 
-Let's see how far we can get re-implementing the previous graphical editor. First, the most basic form of caching should be supported:
+Now we can start defining our lazy functions using this improved design.
 
-Now we can start defining our lazy functions using this improved design:
+To adapt the dependencies into a form that is accepted by the pigro::lazy() function (i.e. when invoking them, they should return a `lazy_result`), we have to create a couple of helper functions.
+
+We start with defining the `arrow` lazy function, which is used as the `icon` dependency to the `mouse_cursor` lazy function. We want that once this function is called, its return value is cached. Fortunately, this is supported out of the box:
+```cpp
+auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
+```
+
+In this case, the lazy function that is created has zero dependencies. As a result, the `load_image()` function is invoked only once and the result is cached and returned. The next time the lazy function is called, the cache is not empty anymore, so the value inside it is returned immediately.
+
+For the `pos` dependency of the `mouse_cursor`, we need to be a bit more creative. We want the `get_mouse_pos()` function to be always called, but we should compare it with the previously cached value, such that we can determine whether it changed.
+
+We start by defining a little helper dependency, named `always_changed()`, whose sole purpose is to always invalidate the lazy function that depends on it:
+```cpp
+auto always_changed() {
+    return lazy_result{ true, 0 };
+}
+```
+
+As can be seen, the `always_changed()` helper function returns a `lazy_result`, and can therefore be used as a dependency. The actual result of the value, `0`, is just a dummy value and can be ignored by the depending function.
+
+Now, we can define the actual `mouse_pos` lazy function:
+```cpp
+auto mouse_pos = pigro::lazy(
+    [](int) { return get_mouse_pos(); },
+    always_changed    
+);
+```
+
+Because we are providing an additional dependency, `always_changed`, we need to wrap the `get_mouse_pos` function with something that "swallows" the result of that dependency. Now, whenever this dependency is called, it will always invoke `get_mouse_pos`, because the `always_changed` dependency indicates that it has changed. However, it will also compare the value with the previously cached result, such that the dependent lazy function (i.e. `mouse_cursor`) will not be invoked.
+
+Finally, we can all tie it together, and define the actual `mouse_cursor` lazy function. The implementation is as simple as in the previous design:
+```cpp
+auto mouse_cursor = pigro::lazy(render_mouse_cursor, mouse_pos, arrow);
+```
+
+This demonstrates the basic idea of the new design: the invalidation of each lazy function is triggered by its dependencies, through the `lazy_result::is_changed` flag, whereas in the previous design the dependencies cache was compared against the new values returned by the dependencies. This has a very important impact on the performance, as it allows us to avoid potentially expensive comparisons.
+
+Secondly, we have now almost halved the memory footprint required for storing the cached values. Finally, as will be seen in later sections, this new design allows for a lot of flexibility, which opens up quite some interesting optimizations for the library.
+
+To give a complete picture of how we can implement the graphics editor example using the new design, here is the full listing:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 
-auto arrow() {
-    auto cache = std::optional<image>{};
-    return [=]() mutable {
-        if (!cache) cache = load_image("arrow.png");
-        return {false, *cache};
-    };
+auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
+
+auto always_changed() {
+    return lazy_result{ true, 0 };
 }
 
-auto mouse_pos() {
-    auto cache = std::optional<point_2d>{};
-    return [=]() mutable {
-        auto pos = get_mouse_pos();
-        return {
-            cache != pos,
-            *cache = pos,
-        };
-    };
-}
+auto mouse_pos = pigro::lazy(
+    [](int) { return get_mouse_pos(); },
+    always_changed    
+);
 
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, mouse_pos, arrow);
 
@@ -71,7 +102,4 @@ while (true) {
 }
 ```
 
-This demonstrates the basic idea of the new design: the invalidation of the dependent lazy function is triggered by the dependencies, through the `lazy_result::is_changed` flag, whereas in the previous design the dependencies cache was compared against the new values returned by the dependencies.
-Apart from halving the memory footprint required for storing the cached values, this new design allows for a lot of flexibility, which opens up quite some interesting uses of the library.
-
-Unfortunately, in the above examples, defining the dependencies themselves still requires quite some boilerplate. Furthermore, there is quite some overlap between those functions and the `lazy()` function. Finally, it is not possible yet to define a lazy function using the `lazy()` function, and use that as a dependency for another lazy function that is also defined using the `lazy()` function. In the next section, we'll discuss how we can further improve on the new design to simplify this even further, and tackle all of these problems.
+As can be seen in the fragment above, the way to define the `mouse_pos` and `arrow` dependencies is rather cumbersome compared to how it was done in the previous design. The next section will discuss how we can improve on that.
