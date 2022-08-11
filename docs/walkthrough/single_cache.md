@@ -70,20 +70,5 @@ while (true) {
 
 This demonstrates the basic idea of the new design: the invalidation of the dependent lazy function is triggered by the dependencies, through the `lazy_result::is_changed` flag, whereas in the previous design the dependencies cache was compared against the new values returned by the dependencies.
 Apart from halving the memory footprint required for storing the cached values, this new design allows for a lot of flexibility, which opens up quite some interesting uses of the library.
-One possible use is for example to avoid the need for a cache for the mouse position altogether, if there is the availability of some system call that returns whether it was changed:
-
-```cpp
-auto get_mouse_pos() -> point_2d;
-auto has_mouse_pos_changed() -> bool;
-
-auto mouse_pos() {
-    return [] {
-        return {
-            has_mouse_pos_changed(),
-            get_mouse_pos(),
-        };
-    };
-}
-```
 
 Unfortunately, in the above examples, defining the dependencies themselves still requires quite some boilerplate. Furthermore, there is quite some overlap between those functions and the `lazy()` function. Finally, it is not possible yet to define a lazy function using the `lazy()` function, and use that as a dependency for another lazy function that is also defined using the `lazy()` function. In the next section, we'll discuss how we can further improve on the new design to simplify this even further, and tackle all of these problems.
