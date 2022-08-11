@@ -8,23 +8,26 @@ We start by introducing a helper struct, `lazy_result`, that can hold the result
 template<typename T>
 struct lazy_result {
     bool is_changed;
-    T value;
+    T result;
 };
 ```
 
-Now, we will make some changes to our `lazy()` function to incorporate the new design. First, we'll remove the dependencies cache, which is no longer necessary as it is already being handled by the dependencies themselves. Second, we need to take into account the fact that all of the dependencies are returning a `lazy_result` when invoked, instead of _only_ the result.
+Now, we will make some changes to our `lazy()` function to incorporate the new design. First, we'll remove the dependencies cache, which is no longer necessary as it is already being handled by the dependencies themselves that are captured inside of lazy function. Second, we need to take into account the fact that all of the dependencies are returning a `lazy_result` when invoked, instead of _only_ the result. Finally, we need to make the lazy function return a lazy_result as well, such that it can be used as a dependency itself.
 
 The new code will be:
 ```cpp
 auto lazy(auto f, auto ...dependencies) {
-    auto cache = std::optional<decltype(f(dependencies().value...))>{};
+    auto cache = std::optional<decltype(f(dependencies().result...))>{};
 
     return [=]() mutable {
-        if (!cache || (dependencies().is_changed || ...)) {
-            cache = f(dependencies().value...);
+        auto is_changed = !cache || (dependencies().is_changed || ...);
+        if (is_changed) {
+            auto result = f(dependencies().result...);
+            is_changed = result != cache;
+            cache = result;
         }
 
-        return *cache;
+        return lazy_result{is_changed, *cache};
     };
 }
 ```
