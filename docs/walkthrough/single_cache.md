@@ -22,7 +22,7 @@ auto lazy(auto f, auto ...dependencies) {
     return [=]() mutable {
         auto is_changed = (dependencies().is_changed || ... || !cache);
         if (is_changed) {
-            auto result = f(dependencies().result...);
+            const auto result = f(dependencies().result...);
             is_changed = result != cache;
             cache = result;
         }
