@@ -20,7 +20,7 @@ auto lazy(auto f, auto ...dependencies) {
     auto cache = std::optional<decltype(f(dependencies().result...))>{};
 
     return [=]() mutable {
-        auto is_changed = !cache || (dependencies().is_changed || ...);
+        auto is_changed = (dependencies().is_changed || ... || !cache);
         if (is_changed) {
             auto result = f(dependencies().result...);
             is_changed = result != cache;
