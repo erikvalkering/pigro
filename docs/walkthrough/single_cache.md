@@ -87,6 +87,60 @@ auto mouse_pos = pigro::lazy(
 
 Because we are providing an additional dependency, `always_changed`, we need to wrap the `get_mouse_pos` function with something that "swallows" the result of that dependency. Now, whenever this dependency is called, it will always invoke `get_mouse_pos`, because the `always_changed` dependency indicates that it has changed. However, it will also compare the value with the previously cached result, such that the dependent lazy function (i.e. `mouse_cursor`) will not be invoked.
 
+Looking closer to what this expands into, will make it very clear what is going on.
+First, we'll substitute `dependencies` (`always_changed`, a.k.a. `[] { return lazy_result{ true, 0 }; }`):
+```cpp
+auto lazy(auto f, auto ...dependencies) {
+    auto cache = std::optional<decltype(f(always_changed().result))>{};
+
+    return [=]() mutable {
+        auto is_changed = always_changed().is_changed || !cache;
+        if (is_changed) {
+            const auto result = f(always_changed().result);
+            is_changed = result != cache;
+            cache = result;
+        }
+
+        return lazy_result{is_changed, *cache};
+    };
+}
+```
+
+Now, we'll substitute `f` (`[](int) { return get_mouse_pos(); }`):
+```cpp
+auto lazy(auto f, auto ...dependencies) {
+    auto cache = std::optional<point_2d>{};
+
+    return [=]() mutable {
+        auto is_changed = true || !cache;
+        if (is_changed) {
+            const auto result = get_mouse_pos();
+            is_changed = result != cache;
+            cache = result;
+        }
+
+        return lazy_result{is_changed, *cache};
+    };
+}
+```
+
+Now, considering that `is_changed` is always `true`, it is very likely that the compiler will optimize this into:
+```cpp
+auto lazy(auto f, auto ...dependencies) {
+    auto cache = std::optional<point_2d>{};
+
+    return [=]() mutable {
+        const auto result = get_mouse_pos();
+        auto is_changed = result != cache;
+        cache = result;
+
+        return lazy_result{is_changed, *cache};
+    };
+}
+```
+
+As can be seen, the final listing is identical to the ad-hoc implementation we started with. On the other hand, it required us a lot less typing to achieve that.
+
 Finally, we can all tie it together, and define the actual `mouse_cursor` lazy function. The implementation is as simple as in the previous design:
 ```cpp
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, mouse_pos, arrow);
