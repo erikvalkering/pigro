@@ -51,9 +51,9 @@ For the `pos` dependency of the `mouse_cursor`, we need to be a bit more creativ
 
 We start by defining a little helper dependency, named `always_changed()`, whose sole purpose is to always invalidate the lazy function that depends on it:
 ```cpp
-auto always_changed() {
+auto always_changed = [] {
     return lazy_result{ true, 0 };
-}
+};
 ```
 
 As can be seen, the `always_changed()` helper function returns a `lazy_result`, and can therefore be used as a dependency. The actual result of the value, `0`, is just a dummy value and can be ignored by the depending function.
