@@ -47,7 +47,26 @@ auto arrow = pigro::lazy([] { return load_image("arrow.png"); });
 
 In this case, the lazy function that is created has zero dependencies. As a result, the `load_image()` function is invoked only once and the result is cached and returned. The next time the lazy function is called, the cache is not empty anymore, so the value inside it is returned immediately.
 
-For the `pos` dependency of the `mouse_cursor`, we need to be a bit more creative. We want the `get_mouse_pos()` function to be always called, but we should compare it with the previously cached value, such that we can determine whether it changed.
+For the `pos` dependency of the `mouse_cursor`, it's a bit more involved. This is because we want the `get_mouse_pos()` function to be always called, but we should compare it with the previously cached value, such that we can determine whether it changed.
+
+Because all that is required from a dependency in the new design, is for it to return a `lazy_result`, we can implement one in an ad-hoc fashion:
+```cpp
+auto mouse_pos() {
+    auto cache = std::optional<point_2d>{};
+
+    return [=]() mutable {
+        const auto result = get_mouse_pos();
+        const auto is_changed = result != cache;
+        cache = result;
+
+        return lazy_result{is_changed, *cache};
+    };
+)
+```
+
+This also demonstrates the flexibility of the new design: if some specific use case is not supported (yet) by the library, we can easily hand-code a solution that satisfies the requirements. Because the requirements of the dependencies are really minimal, we have a lot of freedom in the solution.
+
+However, there is a bit of code duplication between this ad-hoc implementation and the main `pigro::lazy()` function. Let's see whether we can be a bit creative and reuse the `pigro::lazy()` function.
 
 We start by defining a little helper dependency, named `always_changed()`, whose sole purpose is to always invalidate the lazy function that depends on it:
 ```cpp
