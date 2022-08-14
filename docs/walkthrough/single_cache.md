@@ -175,4 +175,6 @@ while (true) {
 }
 ```
 
-As can be seen in the fragment above, the way to define the `mouse_pos` and `arrow` dependencies is rather cumbersome compared to how it was done in the previous design. The next section will discuss how we can improve on that.
+Although the above is already quite concise, if we compare it to the previous design, we can see that for the mouse_pos, we needed to manually introduce an additional lazy function. In the previous design, this was not necessary, as the pigro::lazy() function would already support normal functions out of the box (in fact, that was the _only_ requirement).
+
+In the next section, we will discuss how we can further improve on that, and make it as simple as before.
