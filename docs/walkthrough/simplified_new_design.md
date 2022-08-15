@@ -43,7 +43,7 @@ auto ensure_lazy_dependency(lazy_dependency auto f) {
 ```
 
 Instead, if it is a normal function (i.e. a `std::invocable`), we need to adapt it:
-```c++
+```cpp
 auto ensure_lazy_dependency(std::invocable auto f) {
     return lazy(
         [=](int) { return f(); },
