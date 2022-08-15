@@ -61,8 +61,6 @@ auto ensure_lazy_dependency(auto constant) {
 }
 ```
 
-With this small change, i.e. the lazy functions returned by the `lazy()` function, now also return a `lazy_result`, we can suddenly use lazy functions defined by the `lazy()` function as dependenciess of new lazy functions defined by `lazy()`.
-
 The previous example can now be simplified to this:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
