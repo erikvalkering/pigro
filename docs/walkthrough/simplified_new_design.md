@@ -15,14 +15,14 @@ concept lazy_dependency = std::invocable<F> && requires(F f) {
 
 This concept will satisfy any object that is `std::invocable` using zero parameters, and for which the result contains at least an `is_changed` and `result` data member.
 
-Now, we can constrain the main template using this concept (the actual implementation remains unchanged):
+Now, we can constrain the main `lazy()` overload using this concept (the actual implementation remains unchanged):
 ```cpp
 auto lazy(auto f, lazy_dependency auto ...dependencies) {
     // ...as before...
 }
 ```
 
-This main template will be selected if _all_ of the dependencies satisfy the `lazy_dependency` concept (i.e. they can be invoked _and_ return a `lazy_result`).
+This main `lazy()` overload will be selected only if _all_ of the dependencies satisfy the `lazy_dependency` concept (i.e. they can be invoked _and_ return a `lazy_result`).
 
 Now, we can define an _unconstrained_ overload for `pigro::lazy()`:
 ```cpp
