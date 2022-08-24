@@ -47,7 +47,23 @@ But that adds quite some noise to the code, especially if this happens in many p
 
 Fortunately, with a minor change in our new design, we can change the lazy functions, such that when calling them directly, they return the result, whereas when being used as a dependency, they return the `lazy_result` object.
 
-The first change we need to make is in the main `lazy()` function, which instead of returning a lambda expression directly, first wraps it in a `facade` class:
+We start by introducing a little helper class, named `facade`, which adapts a `lazy_dependency` such that while calling it, it returns the result directly, instead of the `lazy_result`:
+```cpp
+template<lazy_dependency F>
+struct facade : private F {
+    friend auto &ensure_lazy_dependency(facade &self) {
+        return static_cast<F &>(self);
+    }
+
+    auto operator()() const {
+        auto dependency = ensure_lazy_dependency(*this);
+        return dependency().result;
+    }
+};
+```
+In order to call the original `lazy_dependency`, we first obtain a reference to it by calling `ensure_lazy_dependency()`. This function simply casts the object to a reference of the base class, which is the lazy dependency itself (we are inheriting from it). Later we will see that by cleverly choosing this name (i.e. `ensure_lazy_dependency()`), we manage to get everything working without having to make any more modifications (apart from using the `facade` class).
+
+Now, considering the result of the `lazy()` function is a `lazy_dependency`, we can wrap the result inside of a `facade`:
 ```cpp
 auto lazy(auto f, lazy_dependency auto ...dependencies) {
     auto cache = std::optional<decltype(f(dependencies().result...))>{};
@@ -63,22 +79,6 @@ auto lazy(auto f, lazy_dependency auto ...dependencies) {
         return lazy_result{is_changed, *cache};
     }};
 }
-```
-
-This `facade` class serves two purposes: first, it "overrides" the behaviour of the lazy function, by overloading `operator()`, such that when the lazy function is called directly, it only returns the `lazy_result::result` data member.
-Secondly, it provides an `ensure_lazy_dependency()` overload, which is called by the _unconstrained_ `lazy()` function overload that transforms all of the dependencies into a form that satisfies the requirements of the main `lazy()` overload (i.e. that all of the dependencies should satisfy the `lazy_dependency` concept). Additionally, this `ensure_lazy_dependency()` overload is also called inside of `operator()`, in order to obtain the original lambda expression that the facade wraps.
-```cpp
-template<lazy_dependency F>
-struct facade : private F {
-    friend auto &ensure_lazy_dependency(facade &self) {
-        return static_cast<F &>(self);
-    }
-
-    auto operator()() const {
-        auto dependency = ensure_lazy_dependency(*this);
-        return dependency().result;
-    }
-};
 ```
 
 With these two changes, we can finally make the previous example work, but without the ad-hoc fix:
@@ -102,7 +102,7 @@ assert(arrow() == image{...});
 assert(mouse_cursor() == ui_object{...});
 ```
 
-We can analyze what is actually happening while constructing the lazy functions `arrow()` and `mouse_cursor()`.
+we can analyze what is actually happening while constructing the lazy functions `arrow()` and `mouse_cursor()`.
 
 For the `arrow()` lazy function, the _unconstrained_ `lazy()` overload will be selected, because the dependency, `"arrow.png"` does not satisfy the `lazy_dependency` concept.
 Looking again at the implementation of that overload:
@@ -113,7 +113,7 @@ auto lazy(auto f, auto ...dependencies) {
 ```
 we can see that it will transform `"arrow.png"` into a `lazy_dependency` by calling the `ensure_lazy_dependency` function. Subsequently, it will delegate to the main `lazy()` overload, which will put the `facade` around the resulting lazy function, to enable the uniform usage.
 
-The `mouse_cursor()` lazy function is slightly more involved. Also here, because none of the dependencies satisfy the `lazy_dependency` concept, the _unconstrained_ `lazy()` overload is selected. First, we look at the second dependency, `arrow`. Because this dependency _is_ a lazy function, the call to `ensure_lazy_dependency()` will find the one we defined inside of the `facade` class, which in turn returns the unwrapped lazy function that returns the `lazy_result` object and therefore satisfies the `lazy_dependency` concept.
+The `mouse_cursor()` lazy function is slightly more involved. Also here, because none of the dependencies satisfy the `lazy_dependency` concept, the _unconstrained_ `lazy()` overload is selected. First, we look at the second dependency, `arrow`. Because this dependency _is_ a lazy function, the call to `ensure_lazy_dependency()` will find the one we defined inside of the `facade` class, which in turn returns the unwrapped `lazy_dependency` that returns the `lazy_result`.
 The first dependency, however, `get_mouse_pos`, does something interesting. Because of the implementation of the `ensure_lazy_dependency()` that gets called for `get_mouse_pos`:
 ```cpp
 auto ensure_lazy_dependency(std::invocable auto f) {
@@ -124,12 +124,12 @@ auto ensure_lazy_dependency(std::invocable auto f) {
 }
 ```
 We don't actually get back something that satisfies the `lazy_dependency` concept, because of the `facade` that is being wrapped around it by the `lazy()` function.
-However, it turns out that we don't need any extra modifications to make this work, as it works out of the box: because we are delegating to `lazy()` and not all of the dependencies satisfy the `lazy_dependency` concept, the _unconstrained_ `lazy()` overload is being called _again_. But this time, when the dependencies are being transformed, the first _lazy_ `get_mouse_pos` dependency gets successfully transformed to a `lazy_dependency` (similar to how the `arrow` depedendency was being transformed in the first `lazy()` call). The second dependency, the _lazy_dependency_ `arrow`, will just be passed as is, due to the `ensure_lazy_dependency()` overload being selected:
+However, it turns out that we don't need any extra modifications to make this work, as it works out of the box: because we are delegating to `lazy()` and not all of the dependencies satisfy the `lazy_dependency` concept, the _unconstrained_ `lazy()` overload is being called _again_. But this time, when the dependencies are being transformed, the first _lazy_ `get_mouse_pos` dependency gets successfully transformed to a `lazy_dependency` (similar to how the `arrow` depedendency was being transformed in the first `lazy()` call). The second dependency, the _lazy_dependency_ `arrow`, will just be passed as-is, due to the `ensure_lazy_dependency()` overload being selected:
 ```cpp
 auto ensure_lazy_dependency(lazy_dependency auto f) {
     return f;
 }
 ```
-So after this second round of calls to `ensure_lazy_dependency()`, all of the dependencies are now do in fact satisfy the `lazy_dependency` concept, so the final call to `lazy()` will select the main `lazy()` overload.
+So after this second round of calls to `ensure_lazy_dependency()`, all of the dependencies now do in fact satisfy the `lazy_dependency` concept, so the final call to `lazy()` will select the main `lazy()` overload.
 
 As a result, for the dependencies, we can arbitrarily mix lazy functions, non-lazy functions (i.e. `std::invocable`), values, as well as functions that already do satisfy the `lazy_dependency` concept (i.e. functions that return a `lazy_result`).
