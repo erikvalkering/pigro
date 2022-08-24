@@ -1,4 +1,4 @@
-# Simplified new design
+# Syntactic sugar
 
 Using the new design, we efficiently support all of the use cases, though with a small bit of boilerplate required for dependencies that are not yet _lazy_.
 
