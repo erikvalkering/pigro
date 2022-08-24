@@ -54,9 +54,9 @@ auto ensure_lazy_dependency(std::invocable auto f) {
 
 Otherwise, assume it is a value (bonus):
 ```cpp
-auto ensure_lazy_dependency(auto constant) {
+auto ensure_lazy_dependency(auto value) {
     return [=] {
-        return lazy_result{false, constant};
+        return lazy_result{false, value};
     };
 }
 ```
