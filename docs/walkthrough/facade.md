@@ -41,7 +41,7 @@ calculate_twice(lazy_deep_thought, 42); // syntax error: can't compare lazy_resu
 Of course we could fix this in an ad-hoc way:
 ```cpp
 calculate_twice(deep_thought, 42);                               // works
-calculate_twice([=] { return lazy_deep_thought().result; }, 42); // now works
+calculate_twice([&] { return lazy_deep_thought().result; }, 42); // now works
 ```
 But that adds quite some noise to the code, especially if this happens in many places.
 
@@ -70,7 +70,7 @@ Secondly, it provides an `ensure_lazy_dependency()` overload, which is called by
 ```cpp
 template<lazy_dependency F>
 struct facade : private F {
-    friend auto ensure_lazy_dependency(facade &self) {
+    friend auto &ensure_lazy_dependency(facade &self) {
         return static_cast<F &>(self);
     }
 
