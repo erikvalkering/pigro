@@ -1,4 +1,5 @@
 # Facade
+## Introduction
 There is a small but important difference between the previous design and the new design, namely how lazy functions are used.
 In the previous design, if we would define a lazy function as follows:
 ```cpp
@@ -45,6 +46,7 @@ calculate_twice([&] { return lazy_deep_thought().result; }, 42); // now works
 ```
 But that adds quite some noise to the code, especially if this happens in many places.
 
+## Solution
 Fortunately, with a minor change in our new design, we can change the lazy functions, such that when calling them directly, they return the result, whereas when being used as a dependency, they return the `lazy_result` object.
 
 We start by introducing a little helper class, named `facade`, which adapts a `lazy_dependency` such that while calling it, it returns the result directly, instead of the `lazy_result`:
@@ -132,4 +134,5 @@ auto ensure_lazy_dependency(lazy_dependency auto f) {
 ```
 So after this second round of calls to `ensure_lazy_dependency()`, all of the dependencies now do in fact satisfy the `lazy_dependency` concept, so the final call to `lazy()` will select the main `lazy()` overload.
 
+## Conclusion
 As a result, for the dependencies, we can arbitrarily mix lazy functions, non-lazy functions (i.e. `std::invocable`), values, as well as functions that already do satisfy the `lazy_dependency` concept (i.e. functions that return a `lazy_result`).
