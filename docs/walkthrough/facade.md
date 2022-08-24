@@ -13,8 +13,8 @@ auto lazy_deep_thought = pigro::lazy(deep_thought);
 ```
 We could use it in the following way:
 ```cpp
-assert(lazy_deep_thought() == 42); // expensive call
-assert(lazy_deep_thought() == 42); // cheap call
+assert(     deep_thought() == 42);
+assert(lazy_deep_thought() == 42); // same syntax
 ```
 In other words, the api between `deep_thought()` and `lazy_deep_thought()` are identical. If we want to pass either of them to another part of the code and that code is unaware of whether the function is lazy or not, this is possible:
 ```cpp
