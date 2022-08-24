@@ -6,8 +6,8 @@ We can use the same approach, that we took in the [Syntactic sugar](walkthrough/
 
 We'll start by introducing a new concept, called `lazy_dependency`:
 ```cpp
-template<std::invocable F>
-concept lazy_dependency = requires(F f) {
+template<typename F>
+concept lazy_dependency = std::invocable<F> && requires(F f) {
     f().is_changed;
     f().result;
 };
