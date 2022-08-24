@@ -74,6 +74,4 @@ auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
 while (true) {
     mouse_cursor();
 }
-
-// TODO: facade
 ```
