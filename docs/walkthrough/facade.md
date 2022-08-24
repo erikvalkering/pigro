@@ -16,7 +16,7 @@ We could use it in the following way:
 assert(     deep_thought() == 42);
 assert(lazy_deep_thought() == 42); // same syntax
 ```
-In other words, the api between `deep_thought()` and `lazy_deep_thought()` are identical. If we want to pass either of them to another part of the code and that code is unaware of whether the function is lazy or not, this is possible:
+In other words, the api of `deep_thought()` and `lazy_deep_thought()` is identical. If we want to pass either of them to another part of the code and that code is unaware of whether the function is lazy or not, this is totally possible:
 ```cpp
 auto calculate_twice(std::invocable auto f, auto expected) {
     cout << "Calculation started..." << endl;
@@ -28,7 +28,7 @@ auto calculate_twice(std::invocable auto f, auto expected) {
 calculate_twice(deep_thought, 42);      // works
 calculate_twice(lazy_deep_thought, 42); // works & twice as fast
 ```
-However, using the new design, the api of the lazy function is different compared to the function that it transforms:
+Unfortunately, using the new design, the api of the lazy function is different compared to the original function:
 ```cpp
 assert(     deep_thought()        == 42); // directly returns result
 assert(lazy_deep_thought().result == 42); // returns lazy_result
@@ -45,7 +45,7 @@ calculate_twice([=] { return lazy_deep_thought().result; }, 42); // now works
 ```
 But that adds quite some noise to the code, especially if this happens in many places.
 
-Fortunately, with a minor change in our new design, we can change the lazy functions, such that when calling them directly, they return the results, whereas when being used as a dependency, they return the `lazy_result` object.
+Fortunately, with a minor change in our new design, we can change the lazy functions, such that when calling them directly, they return the result, whereas when being used as a dependency, they return the `lazy_result` object.
 
 The first change we need to make is in the main `lazy()` function, which instead of returning a lambda expression directly, first wraps it in a `facade` class:
 ```cpp
@@ -90,7 +90,7 @@ calculate_twice(deep_thought, 42);      // works
 calculate_twice(lazy_deep_thought, 42); // also works & (still) twice as fast
 ```
 
-It becomes really interesting, when we look at a more complex example. If we look again at a part of the graphics editor example:
+It becomes really interesting though, when we look at a more complex example, like for example the graphics editor example:
 ```cpp
 auto arrow = pigro::lazy(load_image, "arrow.png");
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, get_mouse_pos, arrow);
