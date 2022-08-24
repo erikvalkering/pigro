@@ -130,5 +130,6 @@ auto ensure_lazy_dependency(lazy_dependency auto f) {
     return f;
 }
 ```
+So after this second round of calls to `ensure_lazy_dependency()`, all of the dependencies are now do in fact satisfy the `lazy_dependency` concept, so the final call to `lazy()` will select the main `lazy()` overload.
 
-As a result, we can arbitrarily mix lazy functions, non-lazy functions (i.e. `std::invocable`), values, as well as functions that satisfy the `lazy_dependency` concept (i.e. that return a `lazy_result`).
+As a result, for the dependencies, we can arbitrarily mix lazy functions, non-lazy functions (i.e. `std::invocable`), values, as well as functions that already do satisfy the `lazy_dependency` concept (i.e. functions that return a `lazy_result`).
