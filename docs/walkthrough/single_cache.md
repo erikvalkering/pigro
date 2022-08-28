@@ -32,7 +32,7 @@ auto lazy(auto f, auto ...dependencies) {
 }
 ```
 
->[!note] In the above code, there is a small inefficiency: the double call to `dependencies()`. In a later section, we will discuss how this can be optimized into a single call.
+>[!note] In the above code, there is a small inefficiency: the double call to `dependencies()`. In [a later section](walkthrough/single_evaluations.md), we will discuss how this can be optimized into a single call.
 
 - This result in a very flexible design, as it allows us to customize completely the result of the lazy function in an ad-hoc fashion (i.e. if pigro::lazy doesn't support some use case, we can just create a new function that returns a lazy_result).
 
