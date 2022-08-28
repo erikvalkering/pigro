@@ -16,7 +16,7 @@ Now, we will make some changes to our `lazy()` function to incorporate the new d
 
 The new code will be:
 ```cpp
-auto lazy(auto f, auto ...dependencies) {
+auto lazy(auto f, std::invocable auto ...dependencies) {
     auto cache = std::optional<decltype(f(dependencies().result...))>{};
 
     return [=]() mutable {
