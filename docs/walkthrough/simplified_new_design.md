@@ -42,7 +42,7 @@ auto ensure_lazy_dependency(lazy_dependency auto f) {
 }
 ```
 
-Instead, if it is a normal function (i.e. a `std::invocable`), we need to adapt it:
+Instead, if it is a normal function (i.e. a `std::invocable`), we need to adapt it, similar to what we did for the `mouse_pos()` lazy function in the previous section:
 ```cpp
 auto ensure_lazy_dependency(std::invocable auto f) {
     return lazy(
@@ -52,7 +52,7 @@ auto ensure_lazy_dependency(std::invocable auto f) {
 }
 ```
 
-Otherwise, assume it is a value (bonus):
+Otherwise, we assume it is a value. In this case, the implementation is really simple: just return a `lazy_result` containing the value, and flags it as "never changed":
 ```cpp
 auto ensure_lazy_dependency(auto value) {
     return [=] {
