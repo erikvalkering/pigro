@@ -1,6 +1,6 @@
 # Avoiding double dependencies cache
 
-- First of all, we are going to have all of our lazy functions return the flag indicating whether it was changed or not. 
+- First of all, we are going to have all of our lazy functions return the flag indicating whether it was changed or not.
 - Second of all, we don't need to store the cache for the dependencies. If we can assume that all of our dependencies are in fact lazy functions, we know that they have this cache already inside of them.
 
 We start by introducing a helper struct, `lazy_result`, that can hold the result of a lazy function in addition to the flag indicating whether it was changed with respect to the previous time it was called:
@@ -31,6 +31,18 @@ auto lazy(auto f, std::invocable auto ...dependencies) {
     };
 }
 ```
+
+// TODO: discuss this:
+- removed dependencies cache
+- result from .result member
+- return lazy_result
+- is_changed check replaces (unconditional) dependencies_cache comparison
+- extra comparison if reevaluated
+// TODO: last comparison could be made configurable
+
+// TODO: Integrate this paragraph
+Because the dependencies are now properly constrained to be `lazy` dependencies, we can invoke them using the `nullptr` argument and first check the `is_changed` flag to see whether they in fact have changed, before calculating the new result. After having calculated the new result, we should still check whether the value has actually changed (which was done in the previous design, but unconditionally). Finally, we store the result in the cache, and return it together with the flag (both combined as a `lazy_result`).
+// TODO: END - Integrate this paragraph
 
 >[!note] In the above code, there is a small inefficiency: the double call to `dependencies()`. In [a later section](walkthrough/single_evaluations.md), we will discuss how this can be optimized into a single call.
 
@@ -81,7 +93,7 @@ Now, we can define the actual `mouse_pos` lazy function:
 ```cpp
 auto mouse_pos = pigro::lazy(
     [](int) { return get_mouse_pos(); },
-    always_changed    
+    always_changed
 );
 ```
 
@@ -164,7 +176,7 @@ auto always_changed() {
 
 auto mouse_pos = pigro::lazy(
     [](int) { return get_mouse_pos(); },
-    always_changed    
+    always_changed
 );
 
 auto mouse_cursor = pigro::lazy(render_mouse_cursor, mouse_pos, arrow);
@@ -178,3 +190,10 @@ while (true) {
 Although the above is already quite concise, if we compare it to the previous design, we can see that for the mouse_pos, we needed to manually introduce an additional lazy function. In the previous design, this was not necessary, as the pigro::lazy() function would already support normal functions out of the box (in fact, that was the _only_ requirement).
 
 In the next section, we will discuss how we can further improve on that, and make it as simple as before.
+
+// TODO: Integrate this paragraph
+One big difference with the previous design, apart from the algorithmic improvement (i.e. avoiding comparisons), is that we reduced the memory footprint considerably: each lazy function now needs to store only the cache for its own calculated result, whereas previously, it would also hold the caches for all of its dependencies (even though they were already stored in the dependencies themselves if they were lazy). On top of that, in the previous design, for lazy functions having zero dependencies, we would still have to store an `std::optional<std::tuple<>>`, whereas in the new design it no longer necessary.
+
+However, the underlying implementation is much more efficient, both from a work as well as memory perspective.
+// TODO: END - Integrate this paragraph
+

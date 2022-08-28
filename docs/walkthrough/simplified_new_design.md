@@ -61,6 +61,10 @@ auto ensure_lazy_dependency(auto value) {
 }
 ```
 
+// TODO: Integrate this paragraph
+We've updated the user-facing `lazy()` function, by passing all of the dependencies through the `ensure_lazy()` function overload set. This will ensure that all of the dependencies arriving at the `lazy_core()` function, will satisfy the `concepts::lazy` concept. For dependencies that are already satisfied, we simply return them as-is. For others, we will wrap them with the `lazy_value()` utility, just like we did before.
+// TODO: END - Integrate this paragraph
+
 The previous example can now be simplified to this:
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
