@@ -9,7 +9,7 @@
         - [Analysis](walkthrough/basic_analysis.md)
     - [Second attempt - more advanced design](walkthrough/advanced.md)
         - [Avoiding double dependencies cache](walkthrough/single_cache.md)
-        - [Syntactic sugar](walkthrough/simplified_new_design.md)
+        - [Syntactic sugar](walkthrough/../syntactic_sugar_redesign.md)
         - [Facade](walkthrough/facade.md)
         - [Single evaluations](walkthrough/single_evaluations.md)
     - [Final design](walkthrough/final_design.md)
