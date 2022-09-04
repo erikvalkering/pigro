@@ -163,6 +163,7 @@ This demonstrates the basic idea of the new design: the invalidation of each laz
 Secondly, we have now almost halved the memory footprint required for storing the cached values. Finally, as will be seen in later sections, this new design allows for a lot of flexibility, which opens up quite some interesting optimizations for the library.
 
 To give a complete picture of how we can implement the graphics editor example using the new design, here is the full listing:
+## Example
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
@@ -196,4 +197,3 @@ One big difference with the previous design, apart from the algorithmic improvem
 
 However, the underlying implementation is much more efficient, both from a work as well as memory perspective.
 // TODO: END - Integrate this paragraph
-
