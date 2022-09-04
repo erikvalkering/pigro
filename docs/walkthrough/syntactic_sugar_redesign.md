@@ -44,6 +44,10 @@ auto ensure_lazy_dependency(lazy_dependency auto f) {
 
 Instead, if it is a normal function (i.e. a `std::invocable`), we need to adapt it, similar to what we did for the `mouse_pos()` lazy function in the previous section:
 ```cpp
+auto always_changed() {
+    return lazy_result{true, 0};
+}
+
 auto ensure_lazy_dependency(std::invocable auto f) {
     return lazy(
         [=](int) { return f(); },
@@ -52,7 +56,7 @@ auto ensure_lazy_dependency(std::invocable auto f) {
 }
 ```
 
-Otherwise, we assume it is a value. In this case, the implementation is really simple: just return a `lazy_result` containing the value, and flags it as "never changed":
+Otherwise, we assume it is a value. In this case, the implementation is really simple: just return a `lazy_result` containing the value, and flag it as "never changed":
 ```cpp
 auto ensure_lazy_dependency(auto value) {
     return [=] {
@@ -61,11 +65,7 @@ auto ensure_lazy_dependency(auto value) {
 }
 ```
 
-// TODO: Integrate this paragraph
-We've updated the user-facing `lazy()` function, by passing all of the dependencies through the `ensure_lazy()` function overload set. This will ensure that all of the dependencies arriving at the `lazy_core()` function, will satisfy the `concepts::lazy` concept. For dependencies that are already satisfied, we simply return them as-is. For others, we will wrap them with the `lazy_value()` utility, just like we did before.
-// TODO: END - Integrate this paragraph
-
-The previous example can now be simplified to this:
+The [previous example](single_cache.md#example) can now be simplified further into its [original form](basic_analysis.md#example):
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
@@ -79,3 +79,6 @@ while (true) {
     mouse_cursor();
 }
 ```
+
+While the syntax remained the same, we managed to make it more efficient because it will now avoid performing potentially costly comparisons if in case they are not necessary. For example, in the previous version, if the mouse did not move,
+the arrow image would still be compared against the previously cached image. In the new version this is no longer the case, considering none of the dependencies of the arrow lazy function have changed (i.e. the "arrow.png" value didn't change).
