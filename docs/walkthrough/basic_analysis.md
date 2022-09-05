@@ -1,5 +1,6 @@
 # Analysis
 Consider again a somewhat simpler version of the previous code fragment, in which we made the arrow icon also lazy:
+## Example
 ```cpp
 auto render_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
