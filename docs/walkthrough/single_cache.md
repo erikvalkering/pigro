@@ -1,5 +1,6 @@
 # Avoiding double dependencies cache
 
+// TODO: describe these points
 - First of all, we are going to have all of our lazy functions return the flag indicating whether it was changed or not.
 - Second of all, we don't need to store the cache for the dependencies. If we can assume that all of our dependencies are in fact lazy functions, we know that they have this cache already inside of them.
 
@@ -137,6 +138,7 @@ auto lazy(auto f, auto ...dependencies) {
 ```
 
 Now, considering that `is_changed` is always `true`, it is very likely that the compiler will optimize this into:
+// TODO: godbolt link to proof this
 ```cpp
 auto lazy(auto f, auto ...dependencies) {
     auto cache = std::optional<point_2d>{};
