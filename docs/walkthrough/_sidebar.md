@@ -13,6 +13,7 @@
         - [Facade](walkthrough/facade.md)
         - [Single evaluations](walkthrough/single_evaluations.md)
     - [Final design](walkthrough/final_design.md)
-    - [Reactivity all the way down](walkthrough/reactivity_all_the_way_down.md)
+    - Examples
+      - [Reactivity all the way down](walkthrough/reactivity_all_the_way_down.md)
 - **Links**
 - [Github](https://github.com/erikvalkering/pigro)
