@@ -1,4 +1,6 @@
 # Analysis
+// TODO: rewrite this section
+
 Consider again a somewhat simpler version of the previous code fragment, in which we made the arrow icon also lazy:
 ## Example
 ```cpp
@@ -52,4 +54,3 @@ auto foo_c = pigro::lazy(foo, 42);
 ```
 
 If the dependency was a simple function (case `foo_a`, which has `bar` as the dependency, i.e. a normal *non-lazy* function), it will always be recomputed and we are required to compare against the previously computed value. If the dependency is a lazy function (case `foo_b`, which has `foo_a` as a the dependency, i.e. a lazy function), we could in principle avoid the comparison if the dependency wasn't recomputed (i.e. `foo_a` didn't change, which means in turn that `bar` didn't change). Finally, if the dependency is a value (case `foo_c`, which has the *constant* value `42` as the dependency), we also know that we don't need to compare the value, as it can't possibly change. Therefore, we should only consider this latter case: dependencies that are lazy (i.e. case `foo_b`).
-
