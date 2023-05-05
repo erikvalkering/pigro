@@ -37,9 +37,9 @@ auto lazy(auto f, lazy_dependency auto ...dependencies) {
 ```
 
 Even though each dependency is evaluated twice, this doesn't necessary mean that the wrapped function is in fact evaluated twice. If the dependency is also a lazy function, then it will use the machinery of the `pigro::lazy()` function, and therefore only re-evaluate the wrapped function if its dependencies have changed. Otherwise, if the dependency was a value (wrapped using one of the `ensure_lazy_dependency()` overloads), it will not be a problem anyway, as it's a very cheap operation (i.e. it will simply return a previously-cached value, flagging it as "unchanged").
-However, if the dependency was a normal function (also wrapped using one of the `ensure_lazy_dependency()` overloads), it will unconditionally re-evaluate the function, as well as compare it to the previously-cached value. Both of these operations may be costly, so doing them twice is obviously very inefficient.
+However, if the dependency was a normal function (also wrapped using one of the `ensure_lazy_dependency()` overloads), it will unconditionally re-evaluate the function, as well as compare it to the previously-cached value. Both of these operations may be costly, so doing them twice is very inefficient.
 
-Furthermore, apart from the performance issue, it may potentially also result in some unexpected behaviour, if a dependency returns different values between two subsequent invocations. Consider for example a custom non-lazy "on-mouse-click" event that can be used as a dependency:
+Furthermore, apart from the performance issue, it may potentially also result in some unexpected behavior, if a dependency returns different values between two subsequent invocations. Consider for example a custom non-lazy "on-mouse-click" event that can be used as a dependency:
 ```cpp
 auto get_mouse_button_state() -> button_state;
 
