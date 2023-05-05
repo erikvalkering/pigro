@@ -58,17 +58,6 @@ auto on_mouse_click() {
 }
 ```
 This dependency keeps track of transitions in the mouse button's up/down state and will only flag itself as changed in case it detects a transition and if the button state is up, i.e the button was clicked.
-// TODO: add example for manually optimizing away the cache
-```cpp
-auto mouse_pos = [] {
-    return lazy_result{
-        true,
-        get_mouse_pos(),
-    };
-};
-```
-// This is more efficient, if the likelyhood of returning equal mouse cursor coordinates
-// is low.
 
 It can be used for example to implement a click-counter:
 ```cpp
